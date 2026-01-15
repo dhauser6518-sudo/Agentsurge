@@ -10,7 +10,7 @@ import {
   DISPUTE_STATUS_COLORS,
   DISPUTE_REASON_LABELS,
 } from "@/types";
-import { formatPhoneNumber, truncateId, formatDate } from "@/lib/utils";
+import { formatPhoneNumber, formatDate } from "@/lib/utils";
 
 interface RecruitDetailsModalProps {
   recruit: RecruitWithDisputes;

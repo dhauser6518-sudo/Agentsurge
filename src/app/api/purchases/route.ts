@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-04-30.basil",
-});
 
 const PRICES = {
   unlicensed: 3500, // $35
@@ -45,7 +40,7 @@ export async function GET() {
   }
 }
 
-// POST /api/purchases - Create a one-click purchase
+// POST /api/purchases - Create a purchase (simplified without Stripe)
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -54,28 +49,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user with subscription info
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Verify active subscription
-    if (user.subscriptionStatus !== "active") {
-      return NextResponse.json(
-        { error: "Active subscription required" },
-        { status: 403 }
-      );
-    }
-
-    if (!user.stripeCustomerId) {
-      return NextResponse.json(
-        { error: "Payment method not configured" },
-        { status: 400 }
-      );
     }
 
     const body = await request.json();
@@ -112,7 +91,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Reserve recruits from pool
+    // Get recruits from pool
     const recruitsToReserve = await prisma.recruitPool.findMany({
       where: {
         isAvailable: true,
@@ -121,173 +100,59 @@ export async function POST(request: NextRequest) {
       take: qty,
     });
 
-    // Mark as reserved
-    await prisma.recruitPool.updateMany({
-      where: {
-        id: { in: recruitsToReserve.map(r => r.id) },
-      },
-      data: {
-        isAvailable: false,
-        reservedBy: user.id,
-        reservedAt: new Date(),
-      },
-    });
+    const isLicensed = type === "licensed";
+    const purchaseIds: string[] = [];
 
-    // Create purchase records
-    const purchaseRecords = await Promise.all(
-      recruitsToReserve.map(recruit =>
-        prisma.recruitPurchase.create({
-          data: {
-            userId: user.id,
-            recruitPoolId: recruit.id,
-            type,
-            amountCents: PRICES[type as keyof typeof PRICES],
-            status: "pending",
-          },
-        })
-      )
-    );
-
-    const purchaseIds = purchaseRecords.map(p => p.id);
-    const totalAmount = qty * PRICES[type as keyof typeof PRICES];
-
-    // Get customer's default payment method
-    const customer = await stripe.customers.retrieve(user.stripeCustomerId);
-
-    if (customer.deleted) {
-      // Release reservations
-      await releaseReservations(user.id, purchaseIds);
-      return NextResponse.json(
-        { error: "Customer not found" },
-        { status: 400 }
-      );
-    }
-
-    const defaultPaymentMethod = customer.invoice_settings?.default_payment_method;
-
-    if (!defaultPaymentMethod) {
-      // Try to get any payment method
-      const paymentMethods = await stripe.paymentMethods.list({
-        customer: user.stripeCustomerId,
-        type: "card",
-        limit: 1,
+    // Create recruits and purchase records
+    for (const poolRecruit of recruitsToReserve) {
+      // Create purchase record
+      const purchase = await prisma.recruitPurchase.create({
+        data: {
+          userId: user.id,
+          recruitPoolId: poolRecruit.id,
+          type,
+          amountCents: PRICES[type as keyof typeof PRICES],
+          status: "delivered",
+          deliveredAt: new Date(),
+        },
       });
 
-      if (paymentMethods.data.length === 0) {
-        await releaseReservations(user.id, purchaseIds);
-        return NextResponse.json(
-          { error: "No payment method on file" },
-          { status: 400 }
-        );
-      }
+      purchaseIds.push(purchase.id);
+
+      // Create recruit for user
+      await prisma.recruit.create({
+        data: {
+          agentId: user.id,
+          firstName: poolRecruit.firstName,
+          lastName: poolRecruit.lastName,
+          phoneNumber: poolRecruit.phoneNumber,
+          email: poolRecruit.email,
+          igHandle: poolRecruit.igHandle,
+          isLicensed,
+          licensedAt: isLicensed ? new Date() : null,
+          purchaseId: purchase.id,
+        },
+      });
+
+      // Remove from pool
+      await prisma.recruitPool.delete({
+        where: { id: poolRecruit.id },
+      });
     }
 
-    // Create and confirm payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalAmount,
-      currency: "usd",
-      customer: user.stripeCustomerId,
-      payment_method: defaultPaymentMethod as string || undefined,
-      off_session: true,
-      confirm: true,
-      metadata: {
-        userId: user.id,
-        purchaseIds: purchaseIds.join(","),
-        type,
-        quantity: qty.toString(),
-      },
-    });
-
-    // Update purchases with payment intent ID
-    await prisma.recruitPurchase.updateMany({
-      where: { id: { in: purchaseIds } },
-      data: { stripePaymentIntentId: paymentIntent.id },
-    });
-
-    // If payment succeeded immediately, deliver recruits
-    if (paymentIntent.status === "succeeded") {
-      await deliverRecruits(purchaseIds, recruitsToReserve, user.id, type === "licensed");
-    }
+    const totalAmount = qty * PRICES[type as keyof typeof PRICES];
 
     return NextResponse.json({
       success: true,
       purchaseIds,
-      status: paymentIntent.status,
+      status: "delivered",
       total: totalAmount / 100,
     });
   } catch (error) {
     console.error("Error creating purchase:", error);
-
-    // Handle Stripe card errors
-    if (error instanceof Stripe.errors.StripeCardError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
-    }
-
     return NextResponse.json(
       { error: "Failed to process purchase" },
       { status: 500 }
     );
-  }
-}
-
-// Helper to release reservations on failure
-async function releaseReservations(userId: string, purchaseIds: string[]) {
-  await prisma.recruitPool.updateMany({
-    where: { reservedBy: userId },
-    data: {
-      isAvailable: true,
-      reservedBy: null,
-      reservedAt: null,
-    },
-  });
-
-  await prisma.recruitPurchase.updateMany({
-    where: { id: { in: purchaseIds } },
-    data: { status: "failed" },
-  });
-}
-
-// Helper to deliver recruits immediately
-async function deliverRecruits(
-  purchaseIds: string[],
-  poolRecruits: { id: string; firstName: string; lastName: string; phoneNumber: string; email: string | null; igHandle: string | null }[],
-  userId: string,
-  isLicensed: boolean
-) {
-  for (let i = 0; i < purchaseIds.length; i++) {
-    const purchase = purchaseIds[i];
-    const poolRecruit = poolRecruits[i];
-
-    // Create recruit
-    await prisma.recruit.create({
-      data: {
-        agentId: userId,
-        firstName: poolRecruit.firstName,
-        lastName: poolRecruit.lastName,
-        phoneNumber: poolRecruit.phoneNumber,
-        email: poolRecruit.email,
-        igHandle: poolRecruit.igHandle,
-        isLicensed,
-        licensedAt: isLicensed ? new Date() : null,
-        purchaseId: purchase,
-      },
-    });
-
-    // Update purchase
-    await prisma.recruitPurchase.update({
-      where: { id: purchase },
-      data: {
-        status: "delivered",
-        deliveredAt: new Date(),
-      },
-    });
-
-    // Remove from pool
-    await prisma.recruitPool.delete({
-      where: { id: poolRecruit.id },
-    });
   }
 }

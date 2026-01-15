@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Table, TableHeader, TableBody, TableRow, TableCell, Button, Dropdown, DropdownItem } from "@/components/ui";
+import { Table, TableHeader, TableBody, TableRow, TableCell, Dropdown, DropdownItem } from "@/components/ui";
 import { StatusBadge } from "./status-badge";
 import { EditNotesModal } from "./edit-notes-modal";
 import { RecruitDetailsModal } from "./recruit-details-modal";
