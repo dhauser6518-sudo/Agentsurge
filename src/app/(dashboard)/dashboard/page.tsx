@@ -2,12 +2,32 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { RecruitTable } from "@/components/recruits/recruit-table";
+import { InventoryCard } from "@/components/purchase/inventory-card";
+import { PurchaseModal } from "@/components/purchase/purchase-modal";
+import { PendingBanner } from "@/components/purchase/pending-banner";
 import { RecruitWithDisputes, RecruitStatus } from "@/types";
+
+const PRICES = {
+  unlicensed: 35,
+  licensed: 50,
+};
 
 export default function UnlicensedPage() {
   const [recruits, setRecruits] = useState<RecruitWithDisputes[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Inventory state
+  const [inventory, setInventory] = useState({ unlicensed: 0, licensed: 0 });
+  const [pendingCount, setPendingCount] = useState(0);
+
+  // Purchase modal state
+  const [purchaseModal, setPurchaseModal] = useState<{
+    isOpen: boolean;
+    type: "unlicensed" | "licensed";
+    quantity: number;
+  }>({ isOpen: false, type: "unlicensed", quantity: 1 });
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   const fetchRecruits = useCallback(async () => {
     try {
@@ -26,9 +46,83 @@ export default function UnlicensedPage() {
     }
   }, []);
 
+  const fetchInventory = useCallback(async () => {
+    try {
+      const response = await fetch("/api/inventory");
+      const data = await response.json();
+      if (response.ok) {
+        setInventory(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch inventory:", err);
+    }
+  }, []);
+
+  const fetchPendingPurchases = useCallback(async () => {
+    try {
+      const response = await fetch("/api/purchases");
+      const data = await response.json();
+      if (response.ok) {
+        const pending = data.purchases?.filter(
+          (p: { status: string }) => p.status === "pending"
+        ).length || 0;
+        setPendingCount(pending);
+      }
+    } catch (err) {
+      console.error("Failed to fetch purchases:", err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchRecruits();
-  }, [fetchRecruits]);
+    fetchInventory();
+    fetchPendingPurchases();
+
+    // Poll for pending purchases
+    const interval = setInterval(() => {
+      fetchPendingPurchases();
+      if (pendingCount > 0) {
+        fetchRecruits();
+        fetchInventory();
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [fetchRecruits, fetchInventory, fetchPendingPurchases, pendingCount]);
+
+  const handlePurchaseClick = (type: "unlicensed" | "licensed", quantity: number) => {
+    setPurchaseModal({ isOpen: true, type, quantity });
+  };
+
+  const handlePurchaseConfirm = async () => {
+    setIsPurchasing(true);
+    try {
+      const response = await fetch("/api/purchases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: purchaseModal.type,
+          quantity: purchaseModal.quantity,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Purchase failed");
+      }
+
+      // Success - close modal and refresh data
+      setPurchaseModal({ ...purchaseModal, isOpen: false });
+      fetchInventory();
+      fetchPendingPurchases();
+      fetchRecruits();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Purchase failed");
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
 
   const handleStatusChange = async (recruitId: string, status: RecruitStatus) => {
     try {
@@ -127,6 +221,41 @@ export default function UnlicensedPage() {
 
   return (
     <div className="animate-fadeIn">
+      {/* Pending Delivery Banner */}
+      <PendingBanner pendingCount={pendingCount} />
+
+      {/* Buy Recruits Section */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
+            <svg className="w-5 h-5 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">Buy Recruits</h2>
+            <p className="text-sm text-slate-500">One-click purchase with card on file</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InventoryCard
+            type="unlicensed"
+            available={inventory.unlicensed}
+            price={PRICES.unlicensed}
+            onPurchase={(qty) => handlePurchaseClick("unlicensed", qty)}
+            disabled={isPurchasing}
+          />
+          <InventoryCard
+            type="licensed"
+            available={inventory.licensed}
+            price={PRICES.licensed}
+            onPurchase={(qty) => handlePurchaseClick("licensed", qty)}
+            disabled={isPurchasing}
+          />
+        </div>
+      </div>
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -199,6 +328,17 @@ export default function UnlicensedPage() {
         onDisputeSubmit={handleDisputeSubmit}
         onLicenseToggle={handleLicenseToggle}
         showLicenseAction={true}
+      />
+
+      {/* Purchase Confirmation Modal */}
+      <PurchaseModal
+        isOpen={purchaseModal.isOpen}
+        onClose={() => setPurchaseModal({ ...purchaseModal, isOpen: false })}
+        onConfirm={handlePurchaseConfirm}
+        type={purchaseModal.type}
+        quantity={purchaseModal.quantity}
+        pricePerUnit={PRICES[purchaseModal.type]}
+        isLoading={isPurchasing}
       />
     </div>
   );

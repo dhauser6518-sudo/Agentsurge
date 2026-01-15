@@ -14,14 +14,22 @@ model User {
   role         String   @default("agent")
   firstName    String?  @map("first_name")
   lastName     String?  @map("last_name")
+
+  // Subscription fields
+  stripeCustomerId      String?   @unique @map("stripe_customer_id")
+  subscriptionStatus    String    @default("inactive") @map("subscription_status")
+  subscriptionId        String?   @map("stripe_subscription_id")
+  subscriptionPeriodEnd DateTime? @map("subscription_period_end")
+
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  recruits        Recruit[]
-  disputes        Dispute[]     @relation("AgentDisputes")
-  resolvedDisputes Dispute[]    @relation("ResolvedBy")
-  disputeLogs     DisputeLog[]
-  orders          Order[]
+  recruits         Recruit[]
+  disputes         Dispute[]     @relation("AgentDisputes")
+  resolvedDisputes Dispute[]     @relation("ResolvedBy")
+  disputeLogs      DisputeLog[]
+  orders           Order[]
+  purchases        RecruitPurchase[]
 
   @@map("users")
 }
@@ -39,11 +47,13 @@ model Recruit {
   licensedAt   DateTime? @map("licensed_at")
   notes        String?
   stripeOrderId String? @map("stripe_order_id")
+  purchaseId   String?  @unique @map("purchase_id")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  agent    User      @relation(fields: [agentId], references: [id])
+  agent    User              @relation(fields: [agentId], references: [id])
   disputes Dispute[]
+  purchase RecruitPurchase?  @relation(fields: [purchaseId], references: [id])
 
   @@index([agentId])
   @@index([status])
@@ -107,4 +117,45 @@ model Order {
   agent User @relation(fields: [agentId], references: [id])
 
   @@map("orders")
+}
+
+// Available recruit inventory (from Google Sheets)
+model RecruitPool {
+  id           String    @id @default(uuid())
+  firstName    String    @map("first_name")
+  lastName     String    @map("last_name")
+  phoneNumber  String    @map("phone_number")
+  email        String?
+  igHandle     String?   @map("ig_handle")
+  isLicensed   Boolean   @default(false) @map("is_licensed")
+  sourceSheet  String?   @map("source_sheet")
+  sourceRowId  String?   @map("source_row_id")
+  isAvailable  Boolean   @default(true) @map("is_available")
+  reservedAt   DateTime? @map("reserved_at")
+  reservedBy   String?   @map("reserved_by")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([isLicensed, isAvailable])
+  @@index([isAvailable])
+  @@map("recruit_pool")
+}
+
+// Tracks recruit purchases
+model RecruitPurchase {
+  id                    String    @id @default(uuid())
+  userId                String    @map("user_id")
+  recruitPoolId         String?   @map("recruit_pool_id")
+  type                  String    @map("recruit_type")
+  amountCents           Int       @map("amount_cents")
+  status                String    @default("pending")
+  stripePaymentIntentId String?   @map("stripe_payment_intent_id")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  deliveredAt           DateTime? @map("delivered_at")
+
+  user    User     @relation(fields: [userId], references: [id])
+  recruit Recruit?
+
+  @@index([userId])
+  @@index([status])
+  @@map("recruit_purchases")
 }

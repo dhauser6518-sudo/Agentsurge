@@ -6,10 +6,10 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const isAdmin = req.auth?.user?.role === "admin";
 
-  const isAuthPage = nextUrl.pathname.startsWith("/login");
+  const isAuthPage = nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/signup");
   const isApiRoute = nextUrl.pathname.startsWith("/api");
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-  const isPublicRoute = nextUrl.pathname === "/";
+  const isPublicRoute = nextUrl.pathname === "/" || nextUrl.pathname === "/subscription-success";
 
   // Allow API routes to handle their own auth
   if (isApiRoute) {
