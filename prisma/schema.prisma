@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         String   @default("agent")
+  firstName    String?  @map("first_name")
+  lastName     String?  @map("last_name")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  recruits        Recruit[]
+  disputes        Dispute[]     @relation("AgentDisputes")
+  resolvedDisputes Dispute[]    @relation("ResolvedBy")
+  disputeLogs     DisputeLog[]
+  orders          Order[]
+
+  @@map("users")
+}
+
+model Recruit {
+  id           String   @id @default(uuid())
+  agentId      String   @map("agent_id")
+  firstName    String   @map("first_name")
+  lastName     String   @map("last_name")
+  phoneNumber  String   @map("phone_number")
+  email        String?
+  igHandle     String?  @map("ig_handle")
+  status       String   @default("new_recruit")
+  isLicensed   Boolean  @default(false) @map("is_licensed")
+  licensedAt   DateTime? @map("licensed_at")
+  notes        String?
+  stripeOrderId String? @map("stripe_order_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  agent    User      @relation(fields: [agentId], references: [id])
+  disputes Dispute[]
+
+  @@index([agentId])
+  @@index([status])
+  @@index([isLicensed])
+  @@map("recruits")
+}
+
+model Dispute {
+  id              String    @id @default(uuid())
+  recruitId       String    @map("recruit_id")
+  agentId         String    @map("agent_id")
+  reason          String
+  explanation     String?
+  fileUrl         String?   @map("file_url")
+  callReferenceId String?   @map("call_reference_id")
+  status          String    @default("pending_review")
+  adminNotes      String?   @map("admin_notes")
+  resolutionAction String?  @map("resolution_action")
+  resolvedById    String?   @map("resolved_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  resolvedAt      DateTime? @map("resolved_at")
+
+  recruit    Recruit       @relation(fields: [recruitId], references: [id])
+  agent      User          @relation("AgentDisputes", fields: [agentId], references: [id])
+  resolvedBy User?         @relation("ResolvedBy", fields: [resolvedById], references: [id])
+  logs       DisputeLog[]
+
+  @@index([status])
+  @@index([agentId])
+  @@index([recruitId])
+  @@map("disputes")
+}
+
+model DisputeLog {
+  id          String   @id @default(uuid())
+  disputeId   String   @map("dispute_id")
+  action      String
+  performedById String @map("performed_by")
+  details     String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  dispute     Dispute @relation(fields: [disputeId], references: [id])
+  performedBy User    @relation(fields: [performedById], references: [id])
+
+  @@index([disputeId])
+  @@map("dispute_logs")
+}
+
+model Order {
+  id                      String   @id @default(uuid())
+  agentId                 String   @map("agent_id")
+  stripeCheckoutSessionId String?  @unique @map("stripe_checkout_session_id")
+  stripePaymentIntentId   String?  @map("stripe_payment_intent_id")
+  shopifyOrderId          String?  @unique @map("shopify_order_id")
+  amountCents             Int      @map("amount_cents")
+  quantity                Int      @default(1)
+  status                  String   @default("pending")
+  metadata                String?
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  agent User @relation(fields: [agentId], references: [id])
+
+  @@map("orders")
+}
