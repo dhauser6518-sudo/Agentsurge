@@ -740,6 +740,31 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Video Testimonial */}
+      <section className="py-20 border-t border-slate-800">
+        <div className="max-w-3xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center text-white mb-4">
+            Hear From Our Users
+          </h2>
+          <p className="text-center text-slate-400 mb-10">
+            Real results from real agents using AgentSurge
+          </p>
+
+          <div className="relative rounded-2xl overflow-hidden bg-slate-800 shadow-2xl shadow-black/50">
+            <video
+              controls
+              playsInline
+              className="w-full aspect-video"
+              poster=""
+            >
+              <source src="https://res.cloudinary.com/djm2glsrr/video/upload/v1768607531/Matt_Testimonial_raw_msgi03.mov" type="video/quicktime" />
+              <source src="https://res.cloudinary.com/djm2glsrr/video/upload/v1768607531/Matt_Testimonial_raw_msgi03.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </section>
+
       {/* Guarantee Section */}
       <section className="py-16 border-t border-slate-800">
         <div className="max-w-3xl mx-auto px-6">
