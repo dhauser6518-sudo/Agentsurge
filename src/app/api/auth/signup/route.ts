@@ -73,8 +73,17 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Signup error:", error);
+
+    // Return more specific error for debugging
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorName = error instanceof Error ? error.name : "Error";
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        // Temporarily expose error details for debugging - REMOVE AFTER FIX
+        debug: { name: errorName, message: errorMessage }
+      },
       { status: 500 }
     );
   }
