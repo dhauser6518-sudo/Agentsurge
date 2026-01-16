@@ -253,24 +253,6 @@ export default function LandingPage() {
                 <p className="text-slate-400 text-sm mt-1">No credit card required</p>
               </div>
 
-              {/* Recruit Pricing */}
-              <div className="space-y-3 mb-6">
-                <div className="bg-slate-700/50 border border-slate-600 rounded-xl p-4 flex items-center justify-between">
-                  <div>
-                    <span className="text-sm font-semibold text-white">Unlicensed Recruits</span>
-                    <p className="text-xs text-slate-400">Ages 18-25 • Ready to get licensed</p>
-                  </div>
-                  <span className="text-xl font-bold text-amber-400">$35</span>
-                </div>
-                <div className="bg-slate-700/50 border border-slate-600 rounded-xl p-4 flex items-center justify-between">
-                  <div>
-                    <span className="text-sm font-semibold text-white">Licensed Recruits</span>
-                    <p className="text-xs text-slate-400">Ages 18-30 • Already licensed</p>
-                  </div>
-                  <span className="text-xl font-bold text-emerald-400">$50</span>
-                </div>
-              </div>
-
               {/* Trust Badges */}
               <div className="grid grid-cols-4 gap-2 py-4 mb-6 border-y border-slate-700">
                 <div className="text-center">
@@ -921,7 +903,7 @@ export default function LandingPage() {
           100% { transform: translateX(-50%); }
         }
         .animate-scroll {
-          animation: scroll 30s linear infinite;
+          animation: scroll 15s linear infinite;
         }
       `}</style>
     </div>

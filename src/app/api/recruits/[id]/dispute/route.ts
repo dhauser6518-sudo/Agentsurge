@@ -64,7 +64,7 @@ export async function POST(
     }
 
     // Create dispute with audit log in a transaction
-    const dispute = await prisma.$transaction(async (tx: typeof prisma) => {
+    const dispute = await prisma.$transaction(async (tx) => {
       const newDispute = await tx.dispute.create({
         data: {
           recruitId,

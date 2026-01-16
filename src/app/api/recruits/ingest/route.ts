@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         })
       : [];
 
-    const existingOrderIds = new Set(existingRecruits.map((r: { stripeOrderId: string | null }) => r.stripeOrderId));
+    const existingOrderIds = new Set(existingRecruits.map(r => r.stripeOrderId));
 
     // Filter out recruits that already exist
     const newRecruitData: {

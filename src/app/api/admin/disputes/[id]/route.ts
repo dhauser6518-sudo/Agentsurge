@@ -112,7 +112,7 @@ export async function PATCH(
     }
 
     // Update dispute in transaction
-    const updatedDispute = await prisma.$transaction(async (tx: typeof prisma) => {
+    const updatedDispute = await prisma.$transaction(async (tx) => {
       const newStatus = action === "approve" ? "approved" : "denied";
 
       const updated = await tx.dispute.update({
