@@ -38,6 +38,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           name: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || user.email,
           role: user.role,
+          emailVerified: user.emailVerified,
+          subscriptionStatus: user.subscriptionStatus,
+          trialEndsAt: user.trialEndsAt?.toISOString() || null,
         };
       },
     }),
@@ -47,13 +50,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user && user.id) {
         token.id = user.id;
         token.role = (user as { role?: string }).role || "agent";
+        token.emailVerified = (user as { emailVerified?: boolean }).emailVerified ?? false;
+        token.subscriptionStatus = (user as { subscriptionStatus?: string }).subscriptionStatus || "inactive";
+        token.trialEndsAt = (user as { trialEndsAt?: string | null }).trialEndsAt ?? null;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        (session.user as { id: string }).id = token.id as string;
+        (session.user as { role: string }).role = (token.role as string) || "agent";
+        (session.user as { emailVerified: boolean }).emailVerified = (token.emailVerified as boolean) ?? false;
+        (session.user as { subscriptionStatus: string }).subscriptionStatus = (token.subscriptionStatus as string) || "inactive";
+        (session.user as { trialEndsAt: string | null }).trialEndsAt = (token.trialEndsAt as string | null) ?? null;
       }
       return session;
     },

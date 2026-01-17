@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { sendVerificationEmail } from "@/lib/resend";
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,16 +40,49 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
+      // If user exists but email not verified, resend verification
+      if (!existingUser.emailVerified) {
+        const verificationToken = crypto.randomBytes(32).toString("hex");
+        const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+        await prisma.user.update({
+          where: { id: existingUser.id },
+          data: {
+            emailVerificationToken: verificationToken,
+            emailVerificationExpires: verificationExpires,
+          },
+        });
+
+        await sendVerificationEmail(
+          existingUser.email,
+          verificationToken,
+          existingUser.firstName
+        );
+
+        return NextResponse.json(
+          {
+            success: true,
+            message: "Verification email resent",
+            requiresVerification: true,
+          },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         { error: "An account with this email already exists" },
         { status: 409 }
       );
     }
 
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user with verification token
     const user = await prisma.user.create({
       data: {
         email: email.toLowerCase(),
@@ -55,6 +90,9 @@ export async function POST(request: NextRequest) {
         firstName: firstName || null,
         lastName: lastName || null,
         role: "agent",
+        emailVerified: false,
+        emailVerificationToken: verificationToken,
+        emailVerificationExpires: verificationExpires,
       },
       select: {
         id: true,
@@ -64,24 +102,27 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Send verification email
+    await sendVerificationEmail(user.email, verificationToken, user.firstName);
+
     return NextResponse.json(
       {
         success: true,
         user,
+        requiresVerification: true,
+        message: "Please check your email to verify your account",
       },
       { status: 201 }
     );
   } catch (error) {
     console.error("Signup error:", error);
 
-    // Return more specific error for debugging
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     const errorName = error instanceof Error ? error.name : "Error";
 
     return NextResponse.json(
       {
         error: "Internal server error",
-        // Temporarily expose error details for debugging - REMOVE AFTER FIX
         debug: { name: errorName, message: errorMessage }
       },
       { status: 500 }

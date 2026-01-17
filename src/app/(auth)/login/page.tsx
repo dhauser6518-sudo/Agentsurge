@@ -1,21 +1,54 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button, Input } from "@/components/ui";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Show success message if redirected from email verification
+  useEffect(() => {
+    if (searchParams.get("verified") === "true") {
+      setSuccess("Email verified! Please sign in to continue.");
+    }
+  }, [searchParams]);
+
+  // Redirect based on user status after login
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      const user = session.user;
+
+      // Check if email is verified
+      if (!user.emailVerified) {
+        router.push("/verify-email");
+        return;
+      }
+
+      // Check if payment is set up (has active trial or subscription)
+      if (user.subscriptionStatus === "inactive") {
+        router.push("/setup-payment");
+        return;
+      }
+
+      // All good, go to dashboard
+      router.push("/dashboard");
+    }
+  }, [session, status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setIsLoading(true);
 
     try {
@@ -27,10 +60,8 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError("Invalid email or password");
-      } else {
-        router.push("/dashboard");
-        router.refresh();
       }
+      // Session will update and useEffect will handle redirect
     } catch {
       setError("An error occurred. Please try again.");
     } finally {
@@ -110,6 +141,15 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {success && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2 animate-slideDown">
+                  <svg className="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {success}
+                </div>
+              )}
+
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2 animate-slideDown">
                   <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

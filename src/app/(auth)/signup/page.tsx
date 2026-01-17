@@ -57,7 +57,13 @@ export default function SignupPage() {
         return;
       }
 
-      // Auto sign in after successful signup
+      // Redirect to verify email page
+      if (data.requiresVerification) {
+        router.push("/verify-email");
+        return;
+      }
+
+      // Fallback: Auto sign in if no verification needed
       const result = await signIn("credentials", {
         email: formData.email,
         password: formData.password,

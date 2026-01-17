@@ -15,11 +15,17 @@ model User {
   firstName    String?  @map("first_name")
   lastName     String?  @map("last_name")
 
+  // Email verification
+  emailVerified           Boolean   @default(false) @map("email_verified")
+  emailVerificationToken  String?   @unique @map("email_verification_token")
+  emailVerificationExpires DateTime? @map("email_verification_expires")
+
   // Subscription fields
   stripeCustomerId      String?   @unique @map("stripe_customer_id")
   subscriptionStatus    String    @default("inactive") @map("subscription_status")
   subscriptionId        String?   @map("stripe_subscription_id")
   subscriptionPeriodEnd DateTime? @map("subscription_period_end")
+  trialEndsAt           DateTime? @map("trial_ends_at")
 
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
