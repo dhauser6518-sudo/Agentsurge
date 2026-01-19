@@ -324,6 +324,18 @@ export default function LandingPage() {
                 </div>
               </div>
 
+              {/* Pricing Pills */}
+              <div className="flex justify-center gap-3 mb-6">
+                <div className="flex items-center gap-2 px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-full">
+                  <span className="text-sm text-slate-300">Unlicensed</span>
+                  <span className="text-sm font-bold text-emerald-400">$35</span>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-full">
+                  <span className="text-sm text-slate-300">Licensed</span>
+                  <span className="text-sm font-bold text-emerald-400">$50</span>
+                </div>
+              </div>
+
               {/* CTA Button */}
               <button
                 onClick={handleGetStarted}
