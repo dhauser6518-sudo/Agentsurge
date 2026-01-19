@@ -53,11 +53,26 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        await sendVerificationEmail(
-          existingUser.email,
-          verificationToken,
-          existingUser.firstName
-        );
+        try {
+          console.log("Resending verification email to:", existingUser.email);
+          await sendVerificationEmail(
+            existingUser.email,
+            verificationToken,
+            existingUser.firstName
+          );
+          console.log("Verification email resent successfully to:", existingUser.email);
+        } catch (emailError) {
+          console.error("Failed to resend verification email:", emailError);
+          return NextResponse.json(
+            {
+              success: true,
+              message: "Account exists but verification email failed to send. Please contact support.",
+              requiresVerification: true,
+              emailError: emailError instanceof Error ? emailError.message : "Unknown email error",
+            },
+            { status: 200 }
+          );
+        }
 
         return NextResponse.json(
           {
@@ -103,7 +118,24 @@ export async function POST(request: NextRequest) {
     });
 
     // Send verification email
-    await sendVerificationEmail(user.email, verificationToken, user.firstName);
+    try {
+      console.log("Attempting to send verification email to:", user.email);
+      await sendVerificationEmail(user.email, verificationToken, user.firstName);
+      console.log("Verification email sent successfully to:", user.email);
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      // Still return success since account was created, but note email failed
+      return NextResponse.json(
+        {
+          success: true,
+          user,
+          requiresVerification: true,
+          message: "Account created but verification email failed to send. Please contact support.",
+          emailError: emailError instanceof Error ? emailError.message : "Unknown email error",
+        },
+        { status: 201 }
+      );
+    }
 
     return NextResponse.json(
       {

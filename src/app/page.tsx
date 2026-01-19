@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import LogoSlider from "@/components/landing/LogoSlider";
+
+const rotatingWords = ["downline", "overrides", "business"];
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [wordIndex, setWordIndex] = useState(0);
 
   // Calculator state
   const [recruitsPerMonth, setRecruitsPerMonth] = useState(10);
@@ -14,6 +18,14 @@ export default function LandingPage() {
 
   const monthlyIncome = recruitsPerMonth * avgProduction * (overridePercent / 100);
   const annualIncome = monthlyIncome * 12;
+
+  // Rotate headline words
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % rotatingWords.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   // Track scroll position
   useEffect(() => {
@@ -96,11 +108,12 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 tracking-tight">
-            Add Agents to Your Team by Tomorrow
+          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 tracking-tight text-center">
+            <span className="block whitespace-nowrap">Expand your <span key={wordIndex} className="text-sky-400 inline-block animate-fadeInWord">{rotatingWords[wordIndex]}</span></span>
+            <span className="block">in the click of a button</span>
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Every day, our ad campaigns attract licensed and unlicensed candidates ready to start. Pick what you need, make a purchase, and get their full contact info delivered to your custom CRM within minutes.
+            We find people who want to sell insurance both licensed and unlicensed. Create your account, pick how many you need, get their info in your CRM within minutes, then use our proven script to onboard them to your team fast.
           </p>
 
           {/* Feature Pills */}
@@ -250,7 +263,7 @@ export default function LandingPage() {
                 <div className="flex items-baseline justify-center gap-2">
                   <span className="text-3xl font-bold text-white">7-Day Free Trial</span>
                 </div>
-                <p className="text-slate-400 text-sm mt-1">No credit card required</p>
+                <p className="text-slate-400 text-sm mt-1">No charge during trial</p>
               </div>
 
               {/* Trust Badges */}
@@ -298,7 +311,7 @@ export default function LandingPage() {
               </button>
 
               <p className="text-center text-xs text-slate-500 mt-4">
-                No credit card required • Cancel anytime
+                No charge during trial • Cancel anytime
               </p>
             </div>
           </div>
@@ -306,65 +319,7 @@ export default function LandingPage() {
       </section>
 
       {/* Logo Slider */}
-      <section className="py-12 overflow-hidden border-t border-slate-800">
-        <p className="text-center text-xs text-slate-500 uppercase tracking-widest mb-8">Trusted by Top Agencies</p>
-        <div className="relative">
-          <div className="flex animate-scroll">
-            {[...Array(2)].map((_, setIndex) => (
-              <div key={setIndex} className="flex items-center gap-16 px-8">
-                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">P</span>
-                  </div>
-                  <span className="text-slate-400 font-semibold whitespace-nowrap">Primerica</span>
-                </div>
-                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">SF</span>
-                  </div>
-                  <span className="text-slate-400 font-semibold whitespace-nowrap">State Farm</span>
-                </div>
-                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">AF</span>
-                  </div>
-                  <span className="text-slate-400 font-semibold whitespace-nowrap">Aflac</span>
-                </div>
-                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">NYL</span>
-                  </div>
-                  <span className="text-slate-400 font-semibold whitespace-nowrap">New York Life</span>
-                </div>
-                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">MM</span>
-                  </div>
-                  <span className="text-slate-400 font-semibold whitespace-nowrap">MassMutual</span>
-                </div>
-                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">NW</span>
-                  </div>
-                  <span className="text-slate-400 font-semibold whitespace-nowrap">Northwestern</span>
-                </div>
-                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">WFG</span>
-                  </div>
-                  <span className="text-slate-400 font-semibold whitespace-nowrap">World Financial</span>
-                </div>
-                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">TF</span>
-                  </div>
-                  <span className="text-slate-400 font-semibold whitespace-nowrap">Transamerica</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <LogoSlider />
 
       {/* How It Works Section */}
       <section className="py-20 border-t border-slate-800">
@@ -521,33 +476,33 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* What Happens After Purchase */}
+      {/* What Happens After Sign Up */}
       <section className="py-20 border-t border-slate-800">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-white mb-12">
-            What Happens After I Purchase?
+            What Happens After I Sign Up?
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 flex gap-4">
               <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center text-xl flex-shrink-0">✓</div>
               <div>
-                <h4 className="font-semibold text-white mb-1">Instant Redirect to Your CRM</h4>
-                <p className="text-sm text-slate-400">After completing your purchase, you&apos;ll be immediately redirected to our recruit management portal.</p>
+                <h4 className="font-semibold text-white mb-1">Instant Access to Your CRM</h4>
+                <p className="text-sm text-slate-400">After signing up, you&apos;ll be immediately redirected to our recruit management portal.</p>
               </div>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 flex gap-4">
               <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center text-xl flex-shrink-0">👤</div>
               <div>
-                <h4 className="font-semibold text-white mb-1">Create Your Free Account</h4>
-                <p className="text-sm text-slate-400">Set up your account in seconds. Your login gives you 24/7 access to all your recruits.</p>
+                <h4 className="font-semibold text-white mb-1">Your Free Account is Ready</h4>
+                <p className="text-sm text-slate-400">Your account is set up in seconds. Your login gives you 24/7 access to all your recruits.</p>
               </div>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 flex gap-4">
               <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center text-xl flex-shrink-0">📋</div>
               <div>
-                <h4 className="font-semibold text-white mb-1">Your Recruits Are Waiting</h4>
-                <p className="text-sm text-slate-400">All your purchased recruits will be ready and waiting in your dashboard with full contact details.</p>
+                <h4 className="font-semibold text-white mb-1">Your Recruits Are Delivered</h4>
+                <p className="text-sm text-slate-400">Your recruits will be delivered to your dashboard with full contact details, ready for you to reach out.</p>
               </div>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 flex gap-4">
@@ -896,6 +851,13 @@ export default function LandingPage() {
         }
         .animate-slideIn {
           animation: slideIn 0.3s ease forwards;
+        }
+        @keyframes fadeInWord {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInWord {
+          animation: fadeInWord 0.3s ease forwards;
         }
         @keyframes moveToDb {
           0% { opacity: 0; transform: translate(-30px, -20px) scale(0.5); }

@@ -57,6 +57,12 @@ export default function SignupPage() {
         return;
       }
 
+      // Check if email failed to send
+      if (data.emailError) {
+        console.error("Email sending failed:", data.emailError);
+        // Still proceed since account was created
+      }
+
       // Redirect to verify email page
       if (data.requiresVerification) {
         router.push("/verify-email");
@@ -74,7 +80,8 @@ export default function SignupPage() {
         setError("Account created but failed to sign in. Please try logging in.");
         router.push("/login");
       } else {
-        router.push("/dashboard");
+        // Redirect to start trial page to collect payment info
+        router.push("/start-trial");
         router.refresh();
       }
     } catch {

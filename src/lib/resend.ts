@@ -1,15 +1,24 @@
 import { Resend } from "resend";
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+const apiKey = process.env.RESEND_API_KEY;
+if (!apiKey) {
+  console.warn("Warning: RESEND_API_KEY is not set. Email functionality will not work.");
+}
+
+export const resend = new Resend(apiKey);
 
 export async function sendVerificationEmail(
   email: string,
   token: string,
   firstName?: string | null
 ) {
-  const verifyUrl = `${process.env.AUTH_URL}/verify-email?token=${token}`;
+  const baseUrl = process.env.AUTH_URL || "http://localhost:3000";
+  const verifyUrl = `${baseUrl}/verify-email?token=${token}`;
 
-  await resend.emails.send({
+  console.log("Sending verification email to:", email);
+  console.log("Verify URL:", verifyUrl);
+
+  const result = await resend.emails.send({
     from: "AgentSurge <noreply@agentsurge.co>",
     to: email,
     subject: "Verify your email - AgentSurge",
@@ -49,4 +58,13 @@ export async function sendVerificationEmail(
       </html>
     `,
   });
+
+  console.log("Resend result:", JSON.stringify(result, null, 2));
+
+  if (result.error) {
+    console.error("Failed to send verification email:", result.error);
+    throw new Error(`Failed to send email: ${result.error.message}`);
+  }
+
+  return result;
 }

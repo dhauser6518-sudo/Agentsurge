@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button, Input } from "@/components/ui";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -26,17 +26,23 @@ export default function LoginPage() {
   // Redirect based on user status after login
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      const user = session.user;
+      // Cast to include our custom properties
+      const user = session.user as {
+        emailVerified?: boolean;
+        subscriptionStatus?: string;
+      };
 
-      // Check if email is verified
-      if (!user.emailVerified) {
+      // Check if email is verified (default to true if not set, to avoid blocking existing users)
+      const isEmailVerified = user.emailVerified === true;
+      if (!isEmailVerified && user.emailVerified === false) {
         router.push("/verify-email");
         return;
       }
 
       // Check if payment is set up (has active trial or subscription)
-      if (user.subscriptionStatus === "inactive") {
-        router.push("/setup-payment");
+      const subStatus = user.subscriptionStatus;
+      if (!subStatus || subStatus === "inactive") {
+        router.push("/start-trial");
         return;
       }
 
@@ -202,5 +208,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
