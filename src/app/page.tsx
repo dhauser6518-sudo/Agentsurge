@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LogoSlider from "@/components/landing/LogoSlider";
 
@@ -114,12 +113,12 @@ export default function LandingPage() {
               {isCheckoutLoading ? "Loading..." : "Try Free →"}
             </button>
           ) : (
-            <button
-              onClick={() => router.push("/login")}
-              className="text-sm text-slate-400 hover:text-sky-400 transition-colors font-medium cursor-pointer"
+            <Link
+              href="/login"
+              className="text-sm text-slate-400 hover:text-sky-400 transition-colors font-medium"
             >
               Sign In
-            </button>
+            </Link>
           )}
         </div>
       </header>
