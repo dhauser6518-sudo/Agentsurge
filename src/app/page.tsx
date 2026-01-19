@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import LogoSlider from "@/components/landing/LogoSlider";
 
@@ -11,6 +11,8 @@ export default function LandingPage() {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [messagesVisible, setMessagesVisible] = useState(false);
+  const messagesRef = useRef<HTMLDivElement>(null);
 
   // Calculator state
   const [recruitsPerMonth, setRecruitsPerMonth] = useState(10);
@@ -35,6 +37,26 @@ export default function LandingPage() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Intersection observer for message bubbles
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setMessagesVisible(true);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (messagesRef.current) {
+      observer.observe(messagesRef.current);
+    }
+
+    return () => observer.disconnect();
   }, []);
 
   const handleGetStarted = async () => {
@@ -99,12 +121,12 @@ export default function LandingPage() {
               {isCheckoutLoading ? "Loading..." : "Try Free →"}
             </button>
           ) : (
-            <Link
-              href="/login"
+            <button
+              onClick={() => window.location.href = "/login"}
               className="text-sm text-slate-400 hover:text-sky-400 transition-colors font-medium"
             >
               Sign In
-            </Link>
+            </button>
           )}
         </div>
       </header>
@@ -164,110 +186,31 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* iMessage Preview */}
-          <div className="max-w-[320px] mx-auto">
-            {/* iPhone Frame */}
-            <div className="bg-[#1a1a1a] rounded-[3rem] p-[10px] shadow-[0_0_60px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.1)] relative">
-              {/* Side buttons */}
-              <div className="absolute left-[-2px] top-[100px] w-[3px] h-[30px] bg-[#2a2a2a] rounded-l-sm" />
-              <div className="absolute left-[-2px] top-[150px] w-[3px] h-[50px] bg-[#2a2a2a] rounded-l-sm" />
-              <div className="absolute left-[-2px] top-[210px] w-[3px] h-[50px] bg-[#2a2a2a] rounded-l-sm" />
-              <div className="absolute right-[-2px] top-[140px] w-[3px] h-[70px] bg-[#2a2a2a] rounded-r-sm" />
-
-              {/* Screen */}
-              <div className="bg-black rounded-[2.5rem] overflow-hidden relative">
-                {/* Dynamic Island */}
-                <div className="absolute top-[10px] left-1/2 -translate-x-1/2 w-[90px] h-[28px] bg-black rounded-full z-20" />
-
-                {/* Status bar */}
-                <div className="bg-black pt-[14px] pb-[6px] px-8 flex items-center justify-between text-white relative z-10">
-                  <span className="text-[14px] font-semibold">9:41</span>
-                  <div className="flex items-center gap-[5px]">
-                    <svg className="w-[18px] h-[12px]" viewBox="0 0 18 12" fill="white">
-                      <path d="M1 4.5C1 3.67 1.67 3 2.5 3h1C4.33 3 5 3.67 5 4.5v5c0 .83-.67 1.5-1.5 1.5h-1C1.67 11 1 10.33 1 9.5v-5zM6 3c0-.55.45-1 1-1h1c.55 0 1 .45 1 1v7c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1V3zM11 1.5c0-.28.22-.5.5-.5h1c.28 0 .5.22.5.5v9c0 .28-.22.5-.5.5h-1c-.28 0-.5-.22-.5-.5v-9z"/>
-                    </svg>
-                    <svg className="w-[16px] h-[12px]" viewBox="0 0 16 12" fill="white">
-                      <path d="M8 2C5.79 2 3.79 2.78 2.24 4.09L0.71 2.56c0-.01-.01-.02-.01-.03C2.45.92 5.09 0 8 0s5.55.92 7.3 2.53c0 .01-.01.02-.01.03l-1.53 1.53C12.21 2.78 10.21 2 8 2zm0 4c-1.38 0-2.63.52-3.59 1.36L2.93 5.87C4.23 4.72 5.99 4 8 4s3.77.72 5.07 1.87l-1.48 1.49C10.63 6.52 9.38 6 8 6zm0 4c-.69 0-1.32.28-1.79.72L8 12.5l1.79-1.78C9.32 10.28 8.69 10 8 10z"/>
-                    </svg>
-                    <svg className="w-[25px] h-[12px]" viewBox="0 0 25 12" fill="white">
-                      <rect x="0" y="1" width="22" height="10" rx="3" stroke="white" strokeWidth="1" fill="none" opacity="0.4"/>
-                      <rect x="23" y="4" width="1.5" height="4" rx="0.5" fill="white" opacity="0.5"/>
-                      <rect x="2" y="3" width="16" height="6" rx="1.5" fill="white"/>
-                    </svg>
-                  </div>
+          {/* iMessage Preview - Bubbles Only */}
+          <div ref={messagesRef} className="max-w-[380px] mx-auto">
+            <div className="space-y-3">
+              {/* Outgoing message 1 */}
+              <div className={`flex justify-end ${messagesVisible ? "message-bubble" : "opacity-0"}`} style={{ animationDelay: "0.1s" }}>
+                <div className="bg-[#0b93f6] text-white px-4 py-3 rounded-[20px] rounded-br-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
+                  Hey Mark, this is John with <em>Your Agency Here</em>. I&apos;ll be helping you onboard with us from here on out.
                 </div>
+              </div>
 
-                {/* Navigation bar */}
-                <div className="bg-[#1c1c1e]/95 backdrop-blur-xl px-4 py-2 flex items-center border-b border-white/10">
-                  <svg className="w-5 h-5 text-[#0a84ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                  <div className="flex-1 flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-cyan-300 flex items-center justify-center text-white font-semibold text-sm mb-1">
-                      MS
-                    </div>
-                    <p className="text-white font-semibold text-[13px]">Marcus S.</p>
-                  </div>
-                  <svg className="w-6 h-6 text-[#0a84ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                  </svg>
+              {/* Incoming message */}
+              <div className={`flex justify-start ${messagesVisible ? "message-bubble" : "opacity-0"}`} style={{ animationDelay: "0.4s" }}>
+                <div className="bg-[#3b3b3d] text-white px-4 py-3 rounded-[20px] rounded-bl-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
+                  Perfect man, excited to get started
                 </div>
+              </div>
 
-                {/* Messages area */}
-                <div className="bg-black px-3 py-4 min-h-[300px]">
-                  {/* Timestamp */}
-                  <p className="text-center text-[11px] text-[#8e8e93] mb-4">Today 2:34 PM</p>
-
-                  {/* Outgoing message */}
-                  <div className="flex justify-end mb-[2px]">
-                    <div className="bg-[#0b93f6] text-white px-[14px] py-[8px] rounded-[18px] rounded-br-[4px] max-w-[240px] text-[15px] leading-[20px]">
-                      Hey Marcus, this is John with Apex Life Insurance. I&apos;ll be guiding you through the onboarding process from here on out.
-                    </div>
-                  </div>
-
-                  {/* Delivered status */}
-                  <p className="text-right text-[11px] text-[#8e8e93] mb-3 pr-1">Delivered</p>
-
-                  {/* Incoming message */}
-                  <div className="flex justify-start mb-3">
-                    <div className="bg-[#3b3b3d] text-white px-[14px] py-[8px] rounded-[18px] rounded-bl-[4px] max-w-[240px] text-[15px] leading-[20px]">
-                      Awesome man, I&apos;m excited to get started!
-                    </div>
-                  </div>
-
-                  {/* Outgoing follow-up */}
-                  <div className="flex justify-end">
-                    <div className="bg-[#0b93f6] text-white px-[14px] py-[8px] rounded-[18px] rounded-br-[4px] max-w-[240px] text-[15px] leading-[20px]">
-                      Perfect! Let me send over the contract now
-                    </div>
-                  </div>
-                </div>
-
-                {/* Input bar */}
-                <div className="bg-[#1c1c1e]/95 backdrop-blur-xl px-3 py-2 flex items-center gap-2 border-t border-white/10">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#8e8e93]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 bg-[#3b3b3d] rounded-full px-4 py-[6px] flex items-center">
-                    <span className="text-[#8e8e93] text-[16px]">iMessage</span>
-                  </div>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[#8e8e93]" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3z"/>
-                      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Home indicator */}
-                <div className="bg-black py-2 flex justify-center">
-                  <div className="w-[120px] h-[4px] bg-white/30 rounded-full" />
+              {/* Outgoing message 2 */}
+              <div className={`flex justify-end ${messagesVisible ? "message-bubble" : "opacity-0"}`} style={{ animationDelay: "0.7s" }}>
+                <div className="bg-[#0b93f6] text-white px-4 py-3 rounded-[20px] rounded-br-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
+                  Sweet, let me send you the steps
                 </div>
               </div>
             </div>
-            <p className="text-center text-slate-400 text-sm mt-6 font-medium">Start onboarding new agents within minutes</p>
+            <p className="text-center text-slate-400 text-sm mt-8 font-medium">Start onboarding new agents within minutes</p>
           </div>
         </div>
       </section>
@@ -941,6 +884,19 @@ export default function LandingPage() {
         }
         .animate-scroll {
           animation: scroll 15s linear infinite;
+        }
+        @keyframes messageFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .message-bubble {
+          animation: messageFadeIn 0.6s ease forwards;
         }
       `}</style>
     </div>
