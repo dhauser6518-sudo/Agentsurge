@@ -24,6 +24,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
+        // Check if user has set a password
+        if (!user.passwordHash) {
+          return null;
+        }
+
         const passwordMatch = await bcrypt.compare(
           credentials.password as string,
           user.passwordHash

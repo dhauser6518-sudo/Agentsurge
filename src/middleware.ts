@@ -8,35 +8,46 @@ export default auth((req) => {
   const subscriptionStatus = (req.auth?.user as { subscriptionStatus?: string } | undefined)?.subscriptionStatus;
   const hasActiveSubscription = subscriptionStatus === "trialing" || subscriptionStatus === "active";
 
-  const isAuthPage = nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/signup");
+  const isLoginPage = nextUrl.pathname === "/login";
   const isApiRoute = nextUrl.pathname.startsWith("/api");
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-  const isPublicRoute = nextUrl.pathname === "/" || nextUrl.pathname === "/subscription-success";
-  const isStartTrialPage = nextUrl.pathname.startsWith("/start-trial");
-  const isVerifyEmailPage = nextUrl.pathname.startsWith("/verify-email");
+  const isPublicRoute = nextUrl.pathname === "/" || nextUrl.pathname === "/welcome";
+  const isAuthSetupRoute = nextUrl.pathname.startsWith("/auth/");
 
   // Allow API routes to handle their own auth
   if (isApiRoute) {
     return NextResponse.next();
   }
 
-  // Redirect logged-in users away from login/signup pages
-  if (isAuthPage && isLoggedIn) {
-    // If no active subscription, send to start-trial
-    if (!hasActiveSubscription) {
-      return NextResponse.redirect(new URL("/start-trial", nextUrl));
-    }
+  // Allow auth setup routes (magic link, reset password)
+  if (isAuthSetupRoute) {
+    return NextResponse.next();
+  }
+
+  // Allow public routes
+  if (isPublicRoute) {
+    return NextResponse.next();
+  }
+
+  // Redirect logged-in users with active subscription away from login page
+  if (isLoginPage && isLoggedIn && hasActiveSubscription) {
     return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
+  // Allow login page for non-logged-in users or users without subscription
+  if (isLoginPage) {
+    return NextResponse.next();
+  }
+
   // Protect dashboard routes - require login
-  if (!isLoggedIn && !isAuthPage && !isPublicRoute && !isVerifyEmailPage) {
+  if (!isLoggedIn) {
     return NextResponse.redirect(new URL("/login", nextUrl));
   }
 
-  // Require active subscription to access dashboard (but allow start-trial and verify-email)
-  if (isLoggedIn && !hasActiveSubscription && !isStartTrialPage && !isAuthPage && !isPublicRoute && !isVerifyEmailPage && !isAdminRoute) {
-    return NextResponse.redirect(new URL("/start-trial", nextUrl));
+  // Require active subscription to access dashboard
+  if (isLoggedIn && !hasActiveSubscription && !isAdminRoute) {
+    // Redirect to home to sign up
+    return NextResponse.redirect(new URL("/", nextUrl));
   }
 
   // Protect admin routes

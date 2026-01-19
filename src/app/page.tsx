@@ -10,6 +10,7 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
   // Calculator state
   const [recruitsPerMonth, setRecruitsPerMonth] = useState(10);
@@ -36,8 +37,25 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleGetStarted = () => {
-    window.location.href = "/signup";
+  const handleGetStarted = async () => {
+    setIsCheckoutLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("No checkout URL returned");
+        setIsCheckoutLoading(false);
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      setIsCheckoutLoading(false);
+    }
   };
 
   const faqs = [

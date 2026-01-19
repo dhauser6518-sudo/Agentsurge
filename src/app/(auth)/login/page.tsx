@@ -15,38 +15,35 @@ function LoginForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
-  // Show success message if redirected from email verification
+  // Show success messages from redirects
   useEffect(() => {
-    if (searchParams.get("verified") === "true") {
-      setSuccess("Email verified! Please sign in to continue.");
+    if (searchParams.get("setup") === "complete") {
+      setSuccess("Account setup complete! Please sign in.");
+    }
+    if (searchParams.get("reset") === "complete") {
+      setSuccess("Password reset! Please sign in with your new password.");
     }
   }, [searchParams]);
 
   // Redirect based on user status after login
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      // Cast to include our custom properties
       const user = session.user as {
-        emailVerified?: boolean;
         subscriptionStatus?: string;
       };
 
-      // Check if email is verified (default to true if not set, to avoid blocking existing users)
-      const isEmailVerified = user.emailVerified === true;
-      if (!isEmailVerified && user.emailVerified === false) {
-        router.push("/verify-email");
-        return;
-      }
-
-      // Check if payment is set up (has active trial or subscription)
       const subStatus = user.subscriptionStatus;
       if (!subStatus || subStatus === "inactive") {
-        router.push("/start-trial");
+        // No subscription - they need to subscribe
+        router.push("/");
         return;
       }
 
-      // All good, go to dashboard
       router.push("/dashboard");
     }
   }, [session, status, router]);
@@ -67,7 +64,6 @@ function LoginForm() {
       if (result?.error) {
         setError("Invalid email or password");
       }
-      // Session will update and useEffect will handle redirect
     } catch {
       setError("An error occurred. Please try again.");
     } finally {
@@ -75,17 +71,111 @@ function LoginForm() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setForgotLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/magic-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setForgotSent(true);
+      }
+    } catch {
+      setError("Failed to send reset link");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="w-full max-w-md">
+          <div className="mb-10 text-center">
+            <h1 className="text-3xl font-light tracking-[0.2em] text-sky-500">AGENTSURGE</h1>
+            <p className="text-xs font-medium tracking-[0.25em] text-slate-600 mt-1">RECRUITING SOLUTIONS</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-8 border border-slate-200">
+            {forgotSent ? (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Check Your Email</h2>
+                <p className="text-slate-500 mb-6">
+                  If an account exists for {forgotEmail}, you&apos;ll receive a password reset link.
+                </p>
+                <Button onClick={() => { setShowForgotPassword(false); setForgotSent(false); }} variant="outline" className="w-full">
+                  Back to Login
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-slate-900">Reset Password</h2>
+                  <p className="text-slate-500 mt-2">Enter your email to receive a reset link</p>
+                </div>
+
+                <form onSubmit={handleForgotPassword} className="space-y-5">
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                      {error}
+                    </div>
+                  )}
+
+                  <Input
+                    id="forgotEmail"
+                    type="email"
+                    label="Email address"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                  />
+
+                  <Button type="submit" className="w-full" size="lg" isLoading={forgotLoading}>
+                    Send Reset Link
+                  </Button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(false)}
+                    className="w-full text-sm text-slate-500 hover:text-slate-700"
+                  >
+                    Back to Login
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Decorative */}
       <div className="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden">
-        {/* Background Pattern */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         </div>
 
-        {/* Content */}
         <div className="relative z-10 flex flex-col justify-center px-16">
           <div className="mb-8">
             <h1 className="text-4xl font-light tracking-[0.2em] text-sky-400">AGENTSURGE</h1>
@@ -176,16 +266,25 @@ function LoginForm() {
                 placeholder="you@example.com"
               />
 
-              <Input
-                id="password"
-                type="password"
-                label="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                placeholder="Enter your password"
-              />
+              <div>
+                <Input
+                  id="password"
+                  type="password"
+                  label="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-sky-600 hover:text-sky-700 mt-2"
+                >
+                  Forgot password?
+                </button>
+              </div>
 
               <Button
                 type="submit"
@@ -201,8 +300,8 @@ function LoginForm() {
           {/* Footer */}
           <p className="text-center text-sm text-slate-500 mt-6">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-sky-600 hover:text-sky-700 font-medium">
-              Sign up
+            <Link href="/#pricing" className="text-sky-600 hover:text-sky-700 font-medium">
+              Start free trial
             </Link>
           </p>
         </div>

@@ -10,13 +10,19 @@ datasource db {
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
-  passwordHash String   @map("password_hash")
+  passwordHash String?  @map("password_hash")
   role         String   @default("agent")
   firstName    String?  @map("first_name")
   lastName     String?  @map("last_name")
 
-  // Email verification
+  // Email verification (set to true after successful payment)
   emailVerified           Boolean   @default(false) @map("email_verified")
+
+  // Magic link authentication
+  magicLinkToken          String?   @unique @map("magic_link_token")
+  magicLinkExpires        DateTime? @map("magic_link_expires")
+
+  // Legacy fields (keeping for migration compatibility)
   emailVerificationToken  String?   @unique @map("email_verification_token")
   emailVerificationExpires DateTime? @map("email_verification_expires")
 
