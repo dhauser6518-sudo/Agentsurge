@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { signOut } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -275,9 +275,12 @@ export default function StartTrialPage() {
           {/* Sign In Link */}
           <p className="text-center text-sm text-slate-500 mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="text-sky-600 hover:text-sky-700 font-medium">
-              Sign in
-            </Link>
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="text-sky-600 hover:text-sky-700 font-medium"
+            >
+              Sign in with a different account
+            </button>
           </p>
         </div>
       </div>
