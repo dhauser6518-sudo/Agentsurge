@@ -24,7 +24,7 @@ export default function LandingPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setWordIndex((prev) => (prev + 1) % rotatingWords.length);
-    }, 2500);
+    }, 1500);
     return () => clearInterval(interval);
   }, []);
 
@@ -93,9 +93,10 @@ export default function LandingPage() {
           {hasScrolled ? (
             <button
               onClick={handleGetStarted}
-              className="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all transform animate-slideIn"
+              disabled={isCheckoutLoading}
+              className="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all transform animate-slideIn disabled:opacity-50 disabled:cursor-wait"
             >
-              Try Free →
+              {isCheckoutLoading ? "Loading..." : "Try Free →"}
             </button>
           ) : (
             <Link
@@ -339,9 +340,10 @@ export default function LandingPage() {
               {/* CTA Button */}
               <button
                 onClick={handleGetStarted}
-                className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-white font-semibold text-lg shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all"
+                disabled={isCheckoutLoading}
+                className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-white font-semibold text-lg shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all disabled:opacity-50 disabled:cursor-wait"
               >
-                Try AgentSurge for Free →
+                {isCheckoutLoading ? "Loading..." : "Try AgentSurge for Free →"}
               </button>
 
               <p className="text-center text-xs text-slate-500 mt-4">
@@ -828,9 +830,10 @@ export default function LandingPage() {
           </p>
           <button
             onClick={handleGetStarted}
-            className="px-8 py-4 bg-gradient-to-r from-sky-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all"
+            disabled={isCheckoutLoading}
+            className="px-8 py-4 bg-gradient-to-r from-sky-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all disabled:opacity-50 disabled:cursor-wait"
           >
-            Try AgentSurge for Free →
+            {isCheckoutLoading ? "Loading..." : "Try AgentSurge for Free →"}
           </button>
           <p className="text-sm text-slate-400 mt-6">
             Already have an account?{" "}
