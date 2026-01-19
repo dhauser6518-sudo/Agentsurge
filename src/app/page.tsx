@@ -7,7 +7,6 @@ import LogoSlider from "@/components/landing/LogoSlider";
 const rotatingWords = ["downline", "overrides", "business"];
 
 export default function LandingPage() {
-  const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
