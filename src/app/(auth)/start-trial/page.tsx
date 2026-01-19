@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -240,7 +241,7 @@ export default function StartTrialPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sky-900 font-semibold">7-Day Free Trial</p>
-                  <p className="text-sky-700 text-sm">Then $99/month</p>
+                  <p className="text-sky-700 text-sm">Then $29/month</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sky-900 font-bold text-2xl">$0</p>
@@ -270,6 +271,14 @@ export default function StartTrialPage() {
               </div>
             </div>
           </div>
+
+          {/* Sign In Link */}
+          <p className="text-center text-sm text-slate-500 mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="text-sky-600 hover:text-sky-700 font-medium">
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>
