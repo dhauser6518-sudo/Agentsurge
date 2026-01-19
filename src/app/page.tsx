@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LogoSlider from "@/components/landing/LogoSlider";
 
 const rotatingWords = ["downline", "overrides", "business"];
 
 export default function LandingPage() {
+  const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
-  const [messagesVisible, setMessagesVisible] = useState(false);
-  const messagesRef = useRef<HTMLDivElement>(null);
+  const [visibleMessages, setVisibleMessages] = useState(0);
 
   // Calculator state
   const [recruitsPerMonth, setRecruitsPerMonth] = useState(10);
@@ -30,34 +31,26 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Track scroll position
+  // Track scroll position and trigger message animations
   useEffect(() => {
     const handleScroll = () => {
-      setHasScrolled(window.scrollY > 50);
+      const scrollY = window.scrollY;
+      setHasScrolled(scrollY > 50);
+
+      // Trigger messages one by one based on scroll position
+      if (scrollY > 20 && visibleMessages < 1) {
+        setVisibleMessages(1);
+      }
+      if (scrollY > 60 && visibleMessages < 2) {
+        setTimeout(() => setVisibleMessages(2), 300);
+      }
+      if (scrollY > 100 && visibleMessages < 3) {
+        setTimeout(() => setVisibleMessages(3), 300);
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Intersection observer for message bubbles
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setMessagesVisible(true);
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    if (messagesRef.current) {
-      observer.observe(messagesRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  }, [visibleMessages]);
 
   const handleGetStarted = async () => {
     setIsCheckoutLoading(true);
@@ -122,8 +115,8 @@ export default function LandingPage() {
             </button>
           ) : (
             <button
-              onClick={() => window.location.href = "/login"}
-              className="text-sm text-slate-400 hover:text-sky-400 transition-colors font-medium"
+              onClick={() => router.push("/login")}
+              className="text-sm text-slate-400 hover:text-sky-400 transition-colors font-medium cursor-pointer"
             >
               Sign In
             </button>
@@ -187,24 +180,24 @@ export default function LandingPage() {
           </div>
 
           {/* iMessage Preview - Bubbles Only */}
-          <div ref={messagesRef} className="max-w-[380px] mx-auto">
+          <div className="max-w-[380px] mx-auto">
             <div className="space-y-3">
               {/* Outgoing message 1 */}
-              <div className={`flex justify-end ${messagesVisible ? "message-bubble" : "opacity-0"}`} style={{ animationDelay: "0.1s" }}>
+              <div className={`flex justify-end transition-all duration-500 ${visibleMessages >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
                 <div className="bg-[#0b93f6] text-white px-4 py-3 rounded-[20px] rounded-br-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
                   Hey Mark, this is John with <em>Your Agency Here</em>. I&apos;ll be helping you onboard with us from here on out.
                 </div>
               </div>
 
               {/* Incoming message */}
-              <div className={`flex justify-start ${messagesVisible ? "message-bubble" : "opacity-0"}`} style={{ animationDelay: "0.4s" }}>
+              <div className={`flex justify-start transition-all duration-500 ${visibleMessages >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
                 <div className="bg-[#3b3b3d] text-white px-4 py-3 rounded-[20px] rounded-bl-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
                   Perfect man, excited to get started
                 </div>
               </div>
 
               {/* Outgoing message 2 */}
-              <div className={`flex justify-end ${messagesVisible ? "message-bubble" : "opacity-0"}`} style={{ animationDelay: "0.7s" }}>
+              <div className={`flex justify-end transition-all duration-500 ${visibleMessages >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
                 <div className="bg-[#0b93f6] text-white px-4 py-3 rounded-[20px] rounded-br-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
                   Sweet, let me send you the steps
                 </div>
@@ -884,19 +877,6 @@ export default function LandingPage() {
         }
         .animate-scroll {
           animation: scroll 15s linear infinite;
-        }
-        @keyframes messageFadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .message-bubble {
-          animation: messageFadeIn 0.6s ease forwards;
         }
       `}</style>
     </div>
