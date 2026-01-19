@@ -317,6 +317,13 @@ export default function LandingPage() {
               <p className="text-center text-xs text-slate-500 mt-4">
                 No charge during trial • Cancel anytime
               </p>
+
+              <p className="text-center text-sm text-slate-400 mt-6">
+                Already have an account?{" "}
+                <Link href="/login" className="text-sky-400 hover:text-sky-300 font-medium">
+                  Sign in
+                </Link>
+              </p>
             </div>
           </div>
         </div>
@@ -795,6 +802,12 @@ export default function LandingPage() {
           >
             Try AgentSurge for Free →
           </button>
+          <p className="text-sm text-slate-400 mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="text-sky-400 hover:text-sky-300 font-medium">
+              Sign in
+            </Link>
+          </p>
         </div>
       </section>
 
