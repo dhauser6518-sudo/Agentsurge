@@ -183,21 +183,42 @@ export default function LandingPage() {
           <div className="max-w-[380px] mx-auto">
             <div className="space-y-3">
               {/* Outgoing message 1 */}
-              <div className={`flex justify-end transition-all duration-500 ${visibleMessages >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+              <div
+                className="flex justify-end"
+                style={{
+                  opacity: visibleMessages >= 1 ? 1 : 0,
+                  transform: visibleMessages >= 1 ? "translateY(0)" : "translateY(16px)",
+                  transition: "opacity 0.6s ease-out, transform 0.6s ease-out"
+                }}
+              >
                 <div className="bg-[#0b93f6] text-white px-4 py-3 rounded-[20px] rounded-br-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
                   Hey Mark, this is John with <em>Your Agency Here</em>. I&apos;ll be helping you onboard with us from here on out.
                 </div>
               </div>
 
               {/* Incoming message */}
-              <div className={`flex justify-start transition-all duration-500 ${visibleMessages >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+              <div
+                className="flex justify-start"
+                style={{
+                  opacity: visibleMessages >= 2 ? 1 : 0,
+                  transform: visibleMessages >= 2 ? "translateY(0)" : "translateY(16px)",
+                  transition: "opacity 0.6s ease-out, transform 0.6s ease-out"
+                }}
+              >
                 <div className="bg-[#3b3b3d] text-white px-4 py-3 rounded-[20px] rounded-bl-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
                   Perfect man, excited to get started
                 </div>
               </div>
 
               {/* Outgoing message 2 */}
-              <div className={`flex justify-end transition-all duration-500 ${visibleMessages >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+              <div
+                className="flex justify-end"
+                style={{
+                  opacity: visibleMessages >= 3 ? 1 : 0,
+                  transform: visibleMessages >= 3 ? "translateY(0)" : "translateY(16px)",
+                  transition: "opacity 0.6s ease-out, transform 0.6s ease-out"
+                }}
+              >
                 <div className="bg-[#0b93f6] text-white px-4 py-3 rounded-[20px] rounded-br-[6px] max-w-[300px] text-[15px] leading-[22px] shadow-lg">
                   Sweet, let me send you the steps
                 </div>
