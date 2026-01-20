@@ -12,6 +12,7 @@ export default function LandingPage() {
   const [wordIndex, setWordIndex] = useState(0);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [visibleMessages, setVisibleMessages] = useState(0);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   // Calculator state
   const [recruitsPerMonth, setRecruitsPerMonth] = useState(10);
@@ -70,6 +71,33 @@ export default function LandingPage() {
       setIsCheckoutLoading(false);
     }
   };
+
+  const testimonials = [
+    {
+      name: "Matt Reynolds",
+      agency: "Symmetry Financial Group",
+      result: "Recruited 47 agents in 3 months",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      videoUrl: "https://res.cloudinary.com/djm2glsrr/video/upload/v1768607531/Matt_Testimonial_raw_msgi03",
+      hasVideo: true,
+    },
+    {
+      name: "Sarah Mitchell",
+      agency: "Family First Life",
+      result: "Built a team of 23 producing agents",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
+      quote: "AgentSurge completely changed how I recruit. Instead of spending hours on cold calls, I get pre-qualified leads delivered instantly. My team has grown faster in 6 months than it did in my first 2 years.",
+      hasVideo: false,
+    },
+    {
+      name: "Marcus Thompson",
+      agency: "PHP Agency",
+      result: "Signed 12 recruits in first month",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+      quote: "I was skeptical at first, but the quality of these leads is incredible. They're actually interested in the business and ready to get started. Best investment I've made for my agency.",
+      hasVideo: false,
+    },
+  ];
 
   const faqs = [
     {
@@ -693,7 +721,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Video Testimonial */}
+      {/* Testimonials Slider */}
       <section className="py-20 border-t border-slate-800">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-white mb-4">
@@ -703,17 +731,100 @@ export default function LandingPage() {
             Real results from real agents using AgentSurge
           </p>
 
-          <div className="relative rounded-2xl overflow-hidden bg-slate-800 shadow-2xl shadow-black/50">
-            <video
-              controls
-              playsInline
-              className="w-full aspect-video"
-              poster=""
+          {/* Slider Container */}
+          <div className="relative">
+            <div
+              className="overflow-hidden touch-pan-y"
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                (e.currentTarget as HTMLElement).dataset.touchStartX = touch.clientX.toString();
+              }}
+              onTouchEnd={(e) => {
+                const touchStartX = parseFloat((e.currentTarget as HTMLElement).dataset.touchStartX || "0");
+                const touchEndX = e.changedTouches[0].clientX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                  if (diff > 0 && currentTestimonial < testimonials.length - 1) {
+                    setCurrentTestimonial(currentTestimonial + 1);
+                  } else if (diff < 0 && currentTestimonial > 0) {
+                    setCurrentTestimonial(currentTestimonial - 1);
+                  }
+                }
+              }}
             >
-              <source src="https://res.cloudinary.com/djm2glsrr/video/upload/v1768607531/Matt_Testimonial_raw_msgi03.mov" type="video/quicktime" />
-              <source src="https://res.cloudinary.com/djm2glsrr/video/upload/v1768607531/Matt_Testimonial_raw_msgi03.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+              <div
+                className="flex transition-transform duration-300 ease-out"
+                style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}
+              >
+                {testimonials.map((testimonial, index) => (
+                  <div key={index} className="w-full flex-shrink-0 px-2">
+                    <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
+                      {testimonial.hasVideo ? (
+                        <video
+                          controls
+                          playsInline
+                          className="w-full aspect-video"
+                        >
+                          <source src={`${testimonial.videoUrl}.mov`} type="video/quicktime" />
+                          <source src={`${testimonial.videoUrl}.mp4`} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : (
+                        <div className="p-8">
+                          <svg className="w-10 h-10 text-sky-400 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                          </svg>
+                          <p className="text-lg text-slate-300 leading-relaxed mb-6">{testimonial.quote}</p>
+                        </div>
+                      )}
+                      <div className="p-6 border-t border-slate-700 flex items-center gap-4">
+                        <img
+                          src={testimonial.image}
+                          alt={testimonial.name}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-sky-400"
+                        />
+                        <div>
+                          <h4 className="font-semibold text-white">{testimonial.name}</h4>
+                          <p className="text-sm text-slate-400">{testimonial.agency}</p>
+                          <p className="text-sm text-emerald-400 font-medium">{testimonial.result}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => setCurrentTestimonial(Math.max(0, currentTestimonial - 1))}
+              className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-white hover:bg-slate-700 transition-colors ${currentTestimonial === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={currentTestimonial === 0}
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setCurrentTestimonial(Math.min(testimonials.length - 1, currentTestimonial + 1))}
+              className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-white hover:bg-slate-700 transition-colors ${currentTestimonial === testimonials.length - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={currentTestimonial === testimonials.length - 1}
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Dots Indicator */}
+            <div className="flex justify-center gap-2 mt-6">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTestimonial(index)}
+                  className={`w-2 h-2 rounded-full transition-colors ${index === currentTestimonial ? "bg-sky-400" : "bg-slate-600 hover:bg-slate-500"}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -729,9 +840,9 @@ export default function LandingPage() {
               </svg>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white mb-2">Fresh Lead Guarantee</h3>
+              <h3 className="text-xl font-bold text-white mb-2">100% Contact Rate Guarantee</h3>
               <p className="text-slate-400">
-                Every recruit opted in within 24 hours. If the contact info is invalid, we replace it free. No questions asked.
+                Every recruit in our database opted in less than 24 hours ago. If the contact info is invalid or you can&apos;t reach out for any reason whatsoever, you&apos;ll be provided a replacement, no questions asked.
               </p>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAvailableRecruits, markRecruitsAsSold } from "@/lib/google-sheets";
 
 const PRICES = {
   unlicensed: 3500, // $35
@@ -76,40 +77,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check inventory
-    const availableCount = await prisma.recruitPool.count({
-      where: {
-        isAvailable: true,
-        isLicensed: type === "licensed",
-      },
-    });
+    const isLicensed = type === "licensed";
 
-    if (availableCount < qty) {
+    // Get available recruits from Google Sheets
+    const availableRecruits = await getAvailableRecruits(isLicensed, qty);
+
+    if (availableRecruits.length < qty) {
       return NextResponse.json(
-        { error: `Only ${availableCount} ${type} recruits available` },
+        { error: `Only ${availableRecruits.length} ${type} recruits available` },
         { status: 400 }
       );
     }
 
-    // Get recruits from pool
-    const recruitsToReserve = await prisma.recruitPool.findMany({
-      where: {
-        isAvailable: true,
-        isLicensed: type === "licensed",
-      },
-      take: qty,
-    });
-
-    const isLicensed = type === "licensed";
     const purchaseIds: string[] = [];
+    const rowIndices: number[] = [];
 
     // Create recruits and purchase records
-    for (const poolRecruit of recruitsToReserve) {
+    for (const sheetRecruit of availableRecruits) {
       // Create purchase record
       const purchase = await prisma.recruitPurchase.create({
         data: {
           userId: user.id,
-          recruitPoolId: poolRecruit.id,
           type,
           amountCents: PRICES[type as keyof typeof PRICES],
           status: "delivered",
@@ -118,27 +106,26 @@ export async function POST(request: NextRequest) {
       });
 
       purchaseIds.push(purchase.id);
+      rowIndices.push(sheetRecruit.rowIndex);
 
       // Create recruit for user
       await prisma.recruit.create({
         data: {
           agentId: user.id,
-          firstName: poolRecruit.firstName,
-          lastName: poolRecruit.lastName,
-          phoneNumber: poolRecruit.phoneNumber,
-          email: poolRecruit.email,
-          igHandle: poolRecruit.igHandle,
+          firstName: sheetRecruit.firstName,
+          lastName: sheetRecruit.lastName,
+          phoneNumber: sheetRecruit.phone,
+          email: sheetRecruit.email || null,
+          igHandle: sheetRecruit.igHandle || null,
           isLicensed,
           licensedAt: isLicensed ? new Date() : null,
           purchaseId: purchase.id,
         },
       });
-
-      // Remove from pool
-      await prisma.recruitPool.delete({
-        where: { id: poolRecruit.id },
-      });
     }
+
+    // Mark recruits as sold in Google Sheets
+    await markRecruitsAsSold(isLicensed, rowIndices, user.email || user.id);
 
     const totalAmount = qty * PRICES[type as keyof typeof PRICES];
 

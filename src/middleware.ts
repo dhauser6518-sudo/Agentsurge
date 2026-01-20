@@ -29,12 +29,7 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  // Redirect logged-in users with active subscription away from login page
-  if (isLoginPage && isLoggedIn && hasActiveSubscription) {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl));
-  }
-
-  // Allow login page for non-logged-in users or users without subscription
+  // Allow login page for all users
   if (isLoginPage) {
     return NextResponse.next();
   }
