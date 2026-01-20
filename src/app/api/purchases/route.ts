@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getAvailableRecruits, markRecruitsAsSold } from "@/lib/google-sheets";
+import { getAvailableRecruits } from "@/lib/google-sheets";
 
 const PRICES = {
   unlicensed: 3500, // $35
@@ -90,7 +90,6 @@ export async function POST(request: NextRequest) {
     }
 
     const purchaseIds: string[] = [];
-    const rowIndices: number[] = [];
 
     // Create recruits and purchase records
     for (const sheetRecruit of availableRecruits) {
@@ -106,7 +105,6 @@ export async function POST(request: NextRequest) {
       });
 
       purchaseIds.push(purchase.id);
-      rowIndices.push(sheetRecruit.rowIndex);
 
       // Create recruit for user
       await prisma.recruit.create({
@@ -123,9 +121,6 @@ export async function POST(request: NextRequest) {
         },
       });
     }
-
-    // Mark recruits as sold in Google Sheets
-    await markRecruitsAsSold(isLicensed, rowIndices, user.email || user.id);
 
     const totalAmount = qty * PRICES[type as keyof typeof PRICES];
 
