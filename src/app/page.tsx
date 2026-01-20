@@ -149,31 +149,31 @@ export default function LandingPage() {
           </p>
 
           {/* Feature Pills */}
-          <div className="flex flex-col items-center gap-3 mb-12">
+          <div className="flex flex-col items-center gap-2 sm:gap-3 mb-12">
             {/* First row - two pills side by side */}
-            <div className="flex flex-wrap justify-center gap-3">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
-                <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="flex justify-center gap-2 sm:gap-3">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                   <polyline points="9 12 11 14 15 10" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                <span className="text-sm font-medium text-slate-300">Verified Contacts</span>
+                <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">Verified Contacts</span>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
-                <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <circle cx="12" cy="12" r="10"/>
                   <polyline points="12 6 12 12 16 14" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                <span className="text-sm font-medium text-slate-300">24hr Fresh Leads</span>
+                <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">24hr Fresh Leads</span>
               </div>
             </div>
             {/* Second row - single pill centered */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
-              <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M22 4 12 14.01 9 11.01"/>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M22 12a10 10 0 1 1-5.93-9.14"/>
               </svg>
-              <span className="text-sm font-medium text-slate-300">Exclusive Access</span>
+              <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">Exclusive Access</span>
             </div>
           </div>
 

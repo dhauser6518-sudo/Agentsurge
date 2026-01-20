@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getInventoryCounts } from "@/lib/google-sheets";
 
-// GET /api/inventory - Get available recruit inventory counts
+// GET /api/inventory - Get available recruit inventory counts from Google Sheets
 export async function GET() {
   try {
     const session = await auth();
@@ -14,28 +14,15 @@ export async function GET() {
       );
     }
 
-    // Count available recruits by type
-    const [unlicensedCount, licensedCount] = await Promise.all([
-      prisma.recruitPool.count({
-        where: {
-          isAvailable: true,
-          isLicensed: false,
-        },
-      }),
-      prisma.recruitPool.count({
-        where: {
-          isAvailable: true,
-          isLicensed: true,
-        },
-      }),
-    ]);
+    // Get inventory counts from Google Sheets
+    const inventory = await getInventoryCounts();
 
     return NextResponse.json({
-      unlicensed: unlicensedCount,
-      licensed: licensedCount,
+      unlicensed: inventory.unlicensed,
+      licensed: inventory.licensed,
     });
   } catch (error) {
-    console.error("Error fetching inventory:", error);
+    console.error("Error fetching inventory from Google Sheets:", error);
     return NextResponse.json(
       { error: "Failed to fetch inventory" },
       { status: 500 }
