@@ -157,7 +157,7 @@ export function ChatBot() {
           </div>
 
           {/* Messages */}
-          <div className="h-80 overflow-y-auto p-4 space-y-4 bg-slate-50">
+          <div className="h-80 overflow-y-auto p-4 space-y-2 bg-white">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -166,10 +166,10 @@ export function ChatBot() {
                 }`}
               >
                 <div
-                  className={`max-w-[80%] px-4 py-2 rounded-2xl text-sm ${
+                  className={`imessage-bubble ${
                     message.role === "user"
-                      ? "bg-gradient-to-r from-sky-500 to-cyan-500 text-white rounded-br-md"
-                      : "bg-white border border-slate-200 text-slate-700 rounded-bl-md shadow-sm"
+                      ? "imessage-bubble-sent"
+                      : "imessage-bubble-received"
                   }`}
                 >
                   {message.content}
@@ -178,11 +178,11 @@ export function ChatBot() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white border border-slate-200 text-slate-700 rounded-2xl rounded-bl-md px-4 py-2 shadow-sm">
+                <div className="imessage-bubble imessage-bubble-received">
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
                 </div>
               </div>

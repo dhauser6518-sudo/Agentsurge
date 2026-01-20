@@ -19,6 +19,7 @@ function LoginForm() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
 
   // Show success messages from redirects
   useEffect(() => {
@@ -30,9 +31,9 @@ function LoginForm() {
     }
   }, [searchParams]);
 
-  // Redirect based on user status after login
+  // Only redirect after a successful login (not on initial page load)
   useEffect(() => {
-    if (status === "authenticated" && session?.user) {
+    if (justLoggedIn && status === "authenticated" && session?.user) {
       const user = session.user as {
         subscriptionStatus?: string;
       };
@@ -46,7 +47,7 @@ function LoginForm() {
 
       router.push("/dashboard");
     }
-  }, [session, status, router]);
+  }, [session, status, router, justLoggedIn]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +64,8 @@ function LoginForm() {
 
       if (result?.error) {
         setError("Invalid email or password");
+      } else {
+        setJustLoggedIn(true);
       }
     } catch {
       setError("An error occurred. Please try again.");

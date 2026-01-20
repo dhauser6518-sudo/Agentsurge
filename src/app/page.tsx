@@ -74,10 +74,10 @@ export default function LandingPage() {
 
   const testimonials = [
     {
-      name: "Matt Reynolds",
-      agency: "Symmetry Financial Group",
-      result: "Recruited 47 agents in 3 months",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      name: "Matt Parker",
+      agency: "Owner of Pioneer United",
+      result: "Recruited 22 agents in the first 5 days",
+      image: "",
       videoUrl: "https://res.cloudinary.com/djm2glsrr/video/upload/v1768607531/Matt_Testimonial_raw_msgi03",
       hasVideo: true,
     },
@@ -310,13 +310,19 @@ export default function LandingPage() {
 
               {/* Pricing Pills */}
               <div className="flex justify-center gap-3 mb-6">
-                <div className="flex items-center gap-2 px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-full">
-                  <span className="text-sm text-slate-300">Unlicensed</span>
-                  <span className="text-sm font-bold text-emerald-400">$35</span>
+                <div className="flex flex-col items-center px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-2xl">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-300">Unlicensed</span>
+                    <span className="text-sm font-bold text-emerald-400">$35</span>
+                  </div>
+                  <span className="text-xs text-slate-500">Ages 18-25</span>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-full">
-                  <span className="text-sm text-slate-300">Licensed</span>
-                  <span className="text-sm font-bold text-emerald-400">$50</span>
+                <div className="flex flex-col items-center px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-2xl">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-300">Licensed</span>
+                    <span className="text-sm font-bold text-emerald-400">$50</span>
+                  </div>
+                  <span className="text-xs text-slate-500">Ages 18-30</span>
                 </div>
               </div>
 
@@ -778,11 +784,13 @@ export default function LandingPage() {
                         </div>
                       )}
                       <div className="p-6 border-t border-slate-700 flex items-center gap-4">
-                        <img
-                          src={testimonial.image}
-                          alt={testimonial.name}
-                          className="w-14 h-14 rounded-full object-cover border-2 border-sky-400"
-                        />
+                        {!testimonial.hasVideo && testimonial.image && (
+                          <img
+                            src={testimonial.image}
+                            alt={testimonial.name}
+                            className="w-14 h-14 rounded-full object-cover border-2 border-sky-400"
+                          />
+                        )}
                         <div>
                           <h4 className="font-semibold text-white">{testimonial.name}</h4>
                           <p className="text-sm text-slate-400">{testimonial.agency}</p>
