@@ -25,18 +25,20 @@ export function InventoryCard({
   const isLicensed = type === "licensed";
   const colorScheme = isLicensed
     ? {
-        bg: "bg-emerald-500/10",
-        border: "border-emerald-500/20",
+        bg: "bg-slate-800",
+        border: "border-emerald-500/30",
         text: "text-emerald-400",
         badge: "bg-emerald-500/20 text-emerald-400",
         button: "from-emerald-500 to-teal-500 shadow-emerald-500/25 hover:shadow-emerald-500/40",
+        priceText: "text-emerald-300",
       }
     : {
-        bg: "bg-amber-500/10",
-        border: "border-amber-500/20",
+        bg: "bg-slate-800",
+        border: "border-amber-500/30",
         text: "text-amber-400",
         badge: "bg-amber-500/20 text-amber-400",
         button: "from-amber-500 to-orange-500 shadow-amber-500/25 hover:shadow-amber-500/40",
+        priceText: "text-amber-300",
       };
 
   const maxQty = Math.min(available, 10);
@@ -61,10 +63,10 @@ export function InventoryCard({
           </h3>
         </div>
         <div className="text-right">
-          <p className={cn("text-2xl font-bold", colorScheme.text)}>
+          <p className={cn("text-2xl font-bold", colorScheme.priceText)}>
             ${price}
           </p>
-          <p className="text-xs text-slate-500">per recruit</p>
+          <p className="text-xs text-slate-400">per recruit</p>
         </div>
       </div>
 

@@ -4,11 +4,9 @@ import { useState } from "react";
 
 export default function CustomRequestPage() {
   const [formData, setFormData] = useState({
-    recruitType: "unlicensed",
-    quantity: 1,
-    state: "",
-    specialRequirements: "",
-    timeline: "standard",
+    name: "",
+    email: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{
@@ -27,21 +25,19 @@ export default function CustomRequestPage() {
 
       setSubmitStatus({
         type: "success",
-        message: "Your custom request has been submitted. Our team will contact you within 24-48 hours.",
+        message: "Thanks for reaching out! We'll get back to you within 24-48 hours.",
       });
 
       // Reset form
       setFormData({
-        recruitType: "unlicensed",
-        quantity: 1,
-        state: "",
-        specialRequirements: "",
-        timeline: "standard",
+        name: "",
+        email: "",
+        message: "",
       });
     } catch {
       setSubmitStatus({
         type: "error",
-        message: "Failed to submit request. Please try again.",
+        message: "Failed to send message. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -49,7 +45,7 @@ export default function CustomRequestPage() {
   };
 
   return (
-    <div className="animate-fadeIn max-w-3xl">
+    <div className="animate-fadeIn max-w-2xl">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -59,8 +55,8 @@ export default function CustomRequestPage() {
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Custom Request</h1>
-            <p className="text-sm text-slate-500">Submit a custom recruit order with specific requirements</p>
+            <h1 className="text-2xl font-bold text-slate-900">Have a custom request?</h1>
+            <p className="text-sm text-slate-500">Talk to us here</p>
           </div>
         </div>
       </div>
@@ -88,134 +84,51 @@ export default function CustomRequestPage() {
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-6">
-        {/* Recruit Type */}
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
+        {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Recruit Type</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, recruitType: "unlicensed" })}
-              className={`px-4 py-3 rounded-xl border-2 text-left transition-all ${
-                formData.recruitType === "unlicensed"
-                  ? "border-sky-500 bg-sky-50"
-                  : "border-slate-200 hover:border-slate-300"
-              }`}
-            >
-              <span className={`font-medium ${formData.recruitType === "unlicensed" ? "text-sky-700" : "text-slate-900"}`}>
-                Unlicensed
-              </span>
-              <p className="text-sm text-slate-500 mt-0.5">$35 per recruit</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, recruitType: "licensed" })}
-              className={`px-4 py-3 rounded-xl border-2 text-left transition-all ${
-                formData.recruitType === "licensed"
-                  ? "border-emerald-500 bg-emerald-50"
-                  : "border-slate-200 hover:border-slate-300"
-              }`}
-            >
-              <span className={`font-medium ${formData.recruitType === "licensed" ? "text-emerald-700" : "text-slate-900"}`}>
-                Licensed
-              </span>
-              <p className="text-sm text-slate-500 mt-0.5">$50 per recruit</p>
-            </button>
-          </div>
-        </div>
-
-        {/* Quantity */}
-        <div>
-          <label htmlFor="quantity" className="block text-sm font-medium text-slate-700 mb-2">
-            Quantity
-          </label>
-          <input
-            type="number"
-            id="quantity"
-            min="1"
-            max="100"
-            value={formData.quantity}
-            onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
-          />
-        </div>
-
-        {/* State Preference */}
-        <div>
-          <label htmlFor="state" className="block text-sm font-medium text-slate-700 mb-2">
-            State Preference (Optional)
+          <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+            Name
           </label>
           <input
             type="text"
-            id="state"
-            placeholder="e.g., California, Texas, Florida"
-            value={formData.state}
-            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+            id="name"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+            placeholder="Your name"
           />
-          <p className="text-xs text-slate-500 mt-1">Leave blank for any state</p>
         </div>
 
-        {/* Timeline */}
+        {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Timeline</label>
-          <div className="grid grid-cols-3 gap-3">
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, timeline: "standard" })}
-              className={`px-4 py-3 rounded-xl border-2 text-center transition-all ${
-                formData.timeline === "standard"
-                  ? "border-sky-500 bg-sky-50"
-                  : "border-slate-200 hover:border-slate-300"
-              }`}
-            >
-              <span className={`font-medium ${formData.timeline === "standard" ? "text-sky-700" : "text-slate-900"}`}>
-                Standard
-              </span>
-              <p className="text-xs text-slate-500 mt-0.5">3-5 days</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, timeline: "rush" })}
-              className={`px-4 py-3 rounded-xl border-2 text-center transition-all ${
-                formData.timeline === "rush"
-                  ? "border-amber-500 bg-amber-50"
-                  : "border-slate-200 hover:border-slate-300"
-              }`}
-            >
-              <span className={`font-medium ${formData.timeline === "rush" ? "text-amber-700" : "text-slate-900"}`}>
-                Rush
-              </span>
-              <p className="text-xs text-slate-500 mt-0.5">1-2 days</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, timeline: "urgent" })}
-              className={`px-4 py-3 rounded-xl border-2 text-center transition-all ${
-                formData.timeline === "urgent"
-                  ? "border-red-500 bg-red-50"
-                  : "border-slate-200 hover:border-slate-300"
-              }`}
-            >
-              <span className={`font-medium ${formData.timeline === "urgent" ? "text-red-700" : "text-slate-900"}`}>
-                Urgent
-              </span>
-              <p className="text-xs text-slate-500 mt-0.5">Same day</p>
-            </button>
-          </div>
+          <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            required
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+            placeholder="your@email.com"
+          />
         </div>
 
-        {/* Special Requirements */}
+        {/* Message */}
         <div>
-          <label htmlFor="specialRequirements" className="block text-sm font-medium text-slate-700 mb-2">
-            Special Requirements (Optional)
+          <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-2">
+            Message
           </label>
           <textarea
-            id="specialRequirements"
-            rows={4}
-            placeholder="Describe any specific requirements for your recruits..."
-            value={formData.specialRequirements}
-            onChange={(e) => setFormData({ ...formData, specialRequirements: e.target.value })}
+            id="message"
+            rows={5}
+            required
+            placeholder="Tell us about your custom request..."
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
             className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all resize-none"
           />
         </div>
@@ -233,27 +146,14 @@ export default function CustomRequestPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Submitting...
+                Sending...
               </span>
             ) : (
-              "Submit Custom Request"
+              "Send Message"
             )}
           </button>
         </div>
       </form>
-
-      {/* Info Box */}
-      <div className="mt-6 bg-slate-50 rounded-xl p-4 border border-slate-200">
-        <div className="flex gap-3">
-          <svg className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-          </svg>
-          <div className="text-sm text-slate-600">
-            <p className="font-medium text-slate-700 mb-1">Need something special?</p>
-            <p>Custom requests allow you to specify exact requirements for your recruit orders. Our team will review your request and contact you within 24-48 hours to confirm availability and pricing.</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
