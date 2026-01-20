@@ -579,7 +579,7 @@ export default function LandingPage() {
           <h2 className="text-2xl font-bold text-white text-center mb-2">Calculate Your Override Income</h2>
           <p className="text-slate-400 text-center mb-8">See how much extra income you could earn by building your team</p>
 
-          <div className="bg-gradient-to-b from-[#4a90d9] to-[#3b7bbf] rounded-2xl p-6">
+          <div className="bg-gradient-to-r from-sky-500 to-cyan-500 rounded-2xl p-6">
             {/* Recruits Slider */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-3">
