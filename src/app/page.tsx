@@ -156,11 +156,11 @@ export default function LandingPage() {
           {/* Trust Badge */}
           <div className="inline-flex items-center gap-3 mb-8 animate-fadeIn">
             <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center text-white text-xs font-semibold border-2 border-slate-900">JM</div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f093fb] to-[#f5576c] flex items-center justify-center text-white text-xs font-semibold border-2 border-slate-900">SK</div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4facfe] to-[#00f2fe] flex items-center justify-center text-white text-xs font-semibold border-2 border-slate-900">RD</div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#43e97b] to-[#38f9d7] flex items-center justify-center text-white text-xs font-semibold border-2 border-slate-900">AP</div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#fa709a] to-[#fee140] flex items-center justify-center text-white text-xs font-semibold border-2 border-slate-900">TL</div>
+              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face" alt="Agent" className="w-8 h-8 rounded-full object-cover border-2 border-slate-900" />
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face" alt="Agent" className="w-8 h-8 rounded-full object-cover border-2 border-slate-900" />
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Agent" className="w-8 h-8 rounded-full object-cover border-2 border-slate-900" />
+              <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face" alt="Agent" className="w-8 h-8 rounded-full object-cover border-2 border-slate-900" />
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Agent" className="w-8 h-8 rounded-full object-cover border-2 border-slate-900" />
             </div>
             <div className="text-left">
               <div className="text-amber-400 text-sm">★★★★★</div>
