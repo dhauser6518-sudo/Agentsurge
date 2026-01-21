@@ -361,7 +361,7 @@ export default function LandingPage() {
           </h2>
           <p className="text-center text-slate-400 max-w-2xl mx-auto mb-16">
             We run targeted advertising campaigns across multiple platforms to find people actively interested in starting an insurance career.
-            These leads flow directly into our verified database, and when you purchase, they&apos;re instantly delivered to your CRM—exclusive and ready to contact.
+            These leads flow directly into our verified database, and when you purchase, they&apos;re instantly delivered to your CRM. Each one is exclusive and ready to contact.
           </p>
 
           <div className="space-y-12">
@@ -461,7 +461,7 @@ export default function LandingPage() {
                 </div>
                 <p className="text-slate-400 leading-relaxed">
                   When you purchase, recruits are immediately and exclusively assigned to you. Access them instantly through
-                  your personalized CRM dashboard—no waiting, no sharing, no competition. Each recruit is yours alone to contact and convert.
+                  your personalized CRM dashboard. No waiting, no sharing, no competition. Each recruit is yours alone to contact and convert.
                 </p>
               </div>
               <div className="flex-1 order-1 lg:order-2 flex justify-center">
@@ -555,7 +555,7 @@ export default function LandingPage() {
               <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center text-xl flex-shrink-0">📊</div>
               <div>
                 <h4 className="font-semibold text-white mb-1">Track & Manage Progress</h4>
-                <p className="text-sm text-slate-400">Keep notes, track outreach status, and monitor your pipeline—all in one place.</p>
+                <p className="text-sm text-slate-400">Keep notes, track outreach status, and monitor your entire pipeline in one place.</p>
               </div>
             </div>
           </div>
@@ -578,7 +578,7 @@ export default function LandingPage() {
                   "Unlicensed recruits: Ages 18-25, ready to get licensed",
                   "Licensed recruits: Ages 18-30, already licensed",
                   "Opted in within the last 24 hours",
-                  "Exclusive to you—never sold to another agency",
+                  "Exclusive to you and never sold to another agency",
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-slate-300">
                     <svg className="w-5 h-5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
