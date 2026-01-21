@@ -512,8 +512,22 @@ export default function LandingPage() {
       <section className="py-20 border-t border-slate-800">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-white mb-12">
-            What Happens After I Sign Up?
+            What happens after signing up?
           </h2>
+
+          {/* Stacked Screenshots */}
+          <div className="relative max-w-2xl mx-auto mb-16 h-[400px]">
+            <img
+              src="https://res.cloudinary.com/djm2glsrr/image/upload/v1768960079/Screenshot_2026-01-20_at_7.47.29_PM_lyhx3t.png"
+              alt="Dashboard Preview"
+              className="absolute top-0 left-0 w-[70%] rounded-xl shadow-2xl shadow-black/50 border border-slate-700"
+            />
+            <img
+              src="https://res.cloudinary.com/djm2glsrr/image/upload/v1768960098/Screenshot_2026-01-20_at_7.48.13_PM_jqwu7q.png"
+              alt="Recruits Preview"
+              className="absolute bottom-0 right-0 w-[70%] rounded-xl shadow-2xl shadow-black/50 border border-slate-700"
+            />
+          </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 flex gap-4">
