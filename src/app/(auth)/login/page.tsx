@@ -20,6 +20,26 @@ function LoginForm() {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [justLoggedIn, setJustLoggedIn] = useState(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+
+  const handleStartTrial = async () => {
+    setIsCheckoutLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setIsCheckoutLoading(false);
+      }
+    } catch {
+      setIsCheckoutLoading(false);
+    }
+  };
 
   // Show success messages from redirects
   useEffect(() => {
@@ -303,9 +323,13 @@ function LoginForm() {
           {/* Footer */}
           <p className="text-center text-sm text-slate-500 mt-6">
             Don&apos;t have an account?{" "}
-            <Link href="/" className="text-sky-600 hover:text-sky-700 font-medium">
-              Start free trial
-            </Link>
+            <button
+              onClick={handleStartTrial}
+              disabled={isCheckoutLoading}
+              className="text-sky-600 hover:text-sky-700 font-medium disabled:opacity-50"
+            >
+              {isCheckoutLoading ? "Loading..." : "Start free trial"}
+            </button>
           </p>
         </div>
       </div>
