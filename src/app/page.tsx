@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import LogoSlider from "@/components/landing/LogoSlider";
 
-const rotatingWords = ["downline", "overrides", "business"];
+const rotatingWords = ["Team", "Downline", "Business"];
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -169,8 +169,8 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 tracking-tight text-center">
-            <span className="block whitespace-nowrap">Expand your <span key={wordIndex} className="text-sky-400 inline-block animate-fadeInWord">{rotatingWords[wordIndex]}</span></span>
-            <span className="block">in the click of a button</span>
+            <span className="block text-sky-400">Click. Buy. Recruit.</span>
+            <span className="block whitespace-nowrap">Grow Your Insurance <span key={wordIndex} className="text-sky-400 inline-block animate-fadeInWord">{rotatingWords[wordIndex]}</span> in Minutes.</span>
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
             We find people who want to sell insurance both licensed and unlicensed. Create your account, pick how many you need, get their info in your CRM within minutes, then use our proven script to onboard them to your team fast.
