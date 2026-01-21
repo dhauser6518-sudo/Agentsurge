@@ -169,7 +169,7 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-3xl lg:text-5xl font-bold text-white mb-6 tracking-tight text-center">
-            <span className="block text-sky-400">Click. Buy. Recruit.</span>
+            <span className="block">Click. Buy. Recruit.</span>
             <span className="block">Grow Your Insurance <span key={wordIndex} className="text-sky-400 inline-block animate-fadeInWord">{rotatingWords[wordIndex]}</span> in Minutes.</span>
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
