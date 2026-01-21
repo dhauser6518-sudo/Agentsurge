@@ -516,7 +516,7 @@ export default function LandingPage() {
           </h2>
 
           {/* Stacked Screenshots */}
-          <div className="relative max-w-2xl mx-auto mb-8 h-[320px]">
+          <div className="relative max-w-2xl mx-auto mb-4 h-[280px]">
             <img
               src="https://res.cloudinary.com/djm2glsrr/image/upload/v1768960079/Screenshot_2026-01-20_at_7.47.29_PM_lyhx3t.png"
               alt="Dashboard Preview"
