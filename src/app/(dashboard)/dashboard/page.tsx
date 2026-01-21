@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { InventoryCard } from "@/components/purchase/inventory-card";
 import { PurchaseModal } from "@/components/purchase/purchase-modal";
 import { PendingBanner } from "@/components/purchase/pending-banner";
@@ -10,7 +11,15 @@ const PRICES = {
   licensed: 50,
 };
 
+const SHOPIFY_STORE = "0rgv5t-st.myshopify.com";
+const SHOPIFY_VARIANTS = {
+  unlicensed: "42366682759239",
+  licensed: "42366682792007",
+};
+
 export default function BuyRecruitsPage() {
+  const { data: session } = useSession();
+
   // Inventory state
   const [inventory, setInventory] = useState({ unlicensed: 0, licensed: 0 });
   const [pendingCount, setPendingCount] = useState(0);
@@ -69,33 +78,23 @@ export default function BuyRecruitsPage() {
     setPurchaseModal({ isOpen: true, type, quantity });
   };
 
-  const handlePurchaseConfirm = async () => {
+  const handlePurchaseConfirm = () => {
     setIsPurchasing(true);
-    try {
-      const response = await fetch("/api/purchases", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: purchaseModal.type,
-          quantity: purchaseModal.quantity,
-        }),
-      });
 
-      const data = await response.json();
+    // Build Shopify checkout URL
+    const variantId = SHOPIFY_VARIANTS[purchaseModal.type];
+    const quantity = purchaseModal.quantity;
+    const email = session?.user?.email || "";
 
-      if (!response.ok) {
-        throw new Error(data.error || "Purchase failed");
-      }
+    let checkoutUrl = `https://${SHOPIFY_STORE}/cart/${variantId}:${quantity}`;
 
-      // Success - close modal and refresh data
-      setPurchaseModal({ ...purchaseModal, isOpen: false });
-      fetchInventory();
-      fetchPendingPurchases();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Purchase failed");
-    } finally {
-      setIsPurchasing(false);
+    // Pre-fill email if available
+    if (email) {
+      checkoutUrl += `?checkout[email]=${encodeURIComponent(email)}`;
     }
+
+    // Redirect to Shopify checkout
+    window.location.href = checkoutUrl;
   };
 
   return (
@@ -113,7 +112,7 @@ export default function BuyRecruitsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Buy Recruits</h1>
-            <p className="text-sm text-slate-500">One-click purchase with card on file</p>
+            <p className="text-sm text-slate-500">Select quantity and checkout securely</p>
           </div>
         </div>
       </div>
@@ -154,8 +153,8 @@ export default function BuyRecruitsPage() {
               <span className="text-sky-600 font-bold">2</span>
             </div>
             <div>
-              <h3 className="font-medium text-slate-900">Confirm Purchase</h3>
-              <p className="text-sm text-slate-500 mt-1">Review your order and confirm payment</p>
+              <h3 className="font-medium text-slate-900">Secure Checkout</h3>
+              <p className="text-sm text-slate-500 mt-1">Complete your purchase securely</p>
             </div>
           </div>
           <div className="flex gap-4">
