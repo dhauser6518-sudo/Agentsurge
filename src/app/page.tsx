@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import LogoSlider from "@/components/landing/LogoSlider";
+import { trackInitiateCheckout } from "@/components/MetaPixel";
 
 const rotatingWords = ["Overrides", "Downline", "Business"];
 
@@ -53,6 +54,7 @@ export default function LandingPage() {
 
   const handleGetStarted = async () => {
     setIsCheckoutLoading(true);
+    trackInitiateCheckout(99);
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -85,7 +87,7 @@ export default function LandingPage() {
       name: "Sarah Mitchell",
       agency: "Family First Life",
       result: "Built a team of 23 producing agents",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
+      image: "",
       quote: "AgentSurge completely changed how I recruit. Instead of spending hours on cold calls, I get pre-qualified leads delivered instantly. My team has grown faster in 6 months than it did in my first 2 years.",
       hasVideo: false,
     },
@@ -93,7 +95,7 @@ export default function LandingPage() {
       name: "Marcus Thompson",
       agency: "PHP Agency",
       result: "Signed 12 recruits in first month",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+      image: "",
       quote: "I was skeptical at first, but the quality of these leads is incredible. They're actually interested in the business and ready to get started. Best investment I've made for my agency.",
       hasVideo: false,
     },

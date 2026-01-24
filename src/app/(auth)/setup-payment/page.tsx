@@ -9,6 +9,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { trackLead, trackInitiateCheckout } from "@/components/MetaPixel";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -55,6 +56,7 @@ function SetupForm() {
         });
 
         if (response.ok) {
+          trackLead();
           router.push("/dashboard");
         } else {
           const data = await response.json();
@@ -111,6 +113,8 @@ export default function SetupPaymentPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    trackInitiateCheckout(99);
+
     const createSetupIntent = async () => {
       try {
         const response = await fetch("/api/stripe/setup-intent", {
