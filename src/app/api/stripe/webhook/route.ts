@@ -6,6 +6,59 @@ import crypto from "crypto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+// Meta Conversions API helper
+async function sendMetaConversionEvent(
+  eventName: string,
+  email: string,
+  value?: number,
+  currency: string = "USD"
+) {
+  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const accessToken = process.env.META_CONVERSIONS_API_TOKEN;
+
+  if (!pixelId || !accessToken) {
+    console.log("Meta Conversions API not configured, skipping event:", eventName);
+    return;
+  }
+
+  // Hash email with SHA256 (required by Meta)
+  const hashedEmail = crypto.createHash("sha256").update(email.toLowerCase().trim()).digest("hex");
+
+  try {
+    const response = await fetch(
+      `https://graph.facebook.com/v18.0/${pixelId}/events`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data: [
+            {
+              event_name: eventName,
+              event_time: Math.floor(Date.now() / 1000),
+              action_source: "website",
+              user_data: {
+                em: [hashedEmail],
+              },
+              custom_data: value
+                ? {
+                    currency,
+                    value,
+                  }
+                : undefined,
+            },
+          ],
+          access_token: accessToken,
+        }),
+      }
+    );
+
+    const result = await response.json();
+    console.log(`Meta ${eventName} event sent:`, result);
+  } catch (error) {
+    console.error(`Failed to send Meta ${eventName} event:`, error);
+  }
+}
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
@@ -47,6 +100,20 @@ export async function POST(request: NextRequest) {
     await handleSubscriptionDeleted(subscription);
   }
 
+  // Track Purchase when first real payment happens (after trial)
+  if (event.type === "invoice.payment_succeeded") {
+    const invoice = event.data.object as Stripe.Invoice;
+
+    // Only track if this is a subscription payment (not $0 trial invoice)
+    if (invoice.amount_paid > 0 && invoice.customer_email) {
+      await sendMetaConversionEvent(
+        "Purchase",
+        invoice.customer_email,
+        invoice.amount_paid / 100 // Convert cents to dollars
+      );
+    }
+  }
+
   return NextResponse.json({ received: true });
 }
 
@@ -59,6 +126,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     console.error("No email in checkout session");
     return;
   }
+
+  // Track StartTrial event in Meta
+  await sendMetaConversionEvent("StartTrial", email, 0);
 
   // Get subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
