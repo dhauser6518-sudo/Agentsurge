@@ -55,10 +55,10 @@ export async function GET(
         orders: {
           select: {
             id: true,
-            recruitType: true,
             quantity: true,
-            amount: true,
+            amountCents: true,
             status: true,
+            metadata: true,
             createdAt: true,
           },
           orderBy: { createdAt: "desc" },

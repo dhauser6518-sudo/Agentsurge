@@ -33,10 +33,10 @@ interface CustomerDetails {
   }>;
   orders: Array<{
     id: string;
-    recruitType: string;
     quantity: number;
-    amount: number;
+    amountCents: number;
     status: string;
+    metadata: string | null;
     createdAt: string;
   }>;
   recruits: Array<{
@@ -276,11 +276,11 @@ export function CustomerDetailPanel({
                     {customer.orders?.slice(0, 5).map((order) => (
                       <div key={order.id} className="flex items-center justify-between text-sm py-2 border-b border-gray-100">
                         <div>
-                          <span className="font-medium">{order.recruitType}</span>
+                          <span className="font-medium">Order</span>
                           <span className="text-gray-500"> x{order.quantity}</span>
                         </div>
                         <div className="text-right">
-                          <span className="font-medium">${(order.amount / 100).toFixed(2)}</span>
+                          <span className="font-medium">${(order.amountCents / 100).toFixed(2)}</span>
                           <p className="text-xs text-gray-400">{formatDate(order.createdAt)}</p>
                         </div>
                       </div>
@@ -326,12 +326,12 @@ export function CustomerDetailPanel({
                   <div key={order.id} className="flex items-center justify-between py-3 border-b border-gray-100">
                     <div>
                       <p className="font-medium text-gray-900">
-                        {order.recruitType} <span className="text-gray-500">x{order.quantity}</span>
+                        Order <span className="text-gray-500">x{order.quantity}</span>
                       </p>
                       <p className="text-sm text-gray-500">{formatDateTime(order.createdAt)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900">${(order.amount / 100).toFixed(2)}</p>
+                      <p className="font-semibold text-gray-900">${(order.amountCents / 100).toFixed(2)}</p>
                       <Badge
                         color={order.status === "completed" ? "green" : order.status === "pending" ? "yellow" : "gray"}
                         size="sm"
