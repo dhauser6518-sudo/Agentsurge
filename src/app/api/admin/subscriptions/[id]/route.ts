@@ -34,8 +34,8 @@ export async function GET(
         purchases: {
           select: {
             id: true,
-            quantity: true,
-            amountPaid: true,
+            type: true,
+            amountCents: true,
             status: true,
             createdAt: true,
             recruit: {
@@ -105,7 +105,7 @@ export async function GET(
     // Calculate summary stats
     const stats = {
       totalPurchases: user.purchases.length,
-      totalSpent: user.purchases.reduce((sum, p) => sum + (p.amountPaid || 0), 0),
+      totalSpent: user.purchases.reduce((sum, p) => sum + (p.amountCents || 0), 0),
       totalRecruits: user.recruits.length,
       totalDisputes: user.disputes.length,
       pendingDisputes: user.disputes.filter((d) => d.status === "pending_review").length,

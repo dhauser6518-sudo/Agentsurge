@@ -19,8 +19,8 @@ interface CustomerDetails {
   updatedAt: string;
   purchases: Array<{
     id: string;
-    quantity: number;
-    amountPaid: number | null;
+    type: string;
+    amountCents: number;
     status: string;
     createdAt: string;
     recruit: {
