@@ -22,7 +22,6 @@ export async function GET(
         email: true,
         firstName: true,
         lastName: true,
-        phone: true,
         stripeCustomerId: true,
         subscriptionStatus: true,
         subscriptionId: true,

@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { Modal, Badge, Button } from "@/components/ui";
-import { formatDate, formatDateTime, formatPhoneNumber } from "@/lib/utils";
+import { formatDate, formatDateTime } from "@/lib/utils";
 
 interface CustomerDetails {
   id: string;
   email: string;
   firstName: string | null;
   lastName: string | null;
-  phone: string | null;
   stripeCustomerId: string | null;
   subscriptionStatus: string;
   subscriptionId: string | null;
@@ -174,12 +173,6 @@ export function CustomerDetailPanel({
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Email</p>
                 <p className="text-sm text-gray-900 mt-1">{customer.email}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Phone</p>
-                <p className="text-sm text-gray-900 mt-1">
-                  {customer.phone ? formatPhoneNumber(customer.phone) : "—"}
-                </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Name</p>
