@@ -44,7 +44,7 @@ interface CustomerDetails {
     firstName: string;
     lastName: string;
     email: string | null;
-    phone: string | null;
+    phoneNumber: string;
     status: string;
     createdAt: string;
   }>;
@@ -301,7 +301,7 @@ export function CustomerDetailPanel({
                       <p className="font-medium text-gray-900">
                         {recruit.firstName} {recruit.lastName}
                       </p>
-                      <p className="text-sm text-gray-500">{recruit.email || recruit.phone || "—"}</p>
+                      <p className="text-sm text-gray-500">{recruit.email || recruit.phoneNumber || "—"}</p>
                     </div>
                     <div className="text-right">
                       <Badge

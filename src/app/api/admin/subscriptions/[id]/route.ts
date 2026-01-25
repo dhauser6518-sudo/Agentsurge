@@ -71,7 +71,7 @@ export async function GET(
             firstName: true,
             lastName: true,
             email: true,
-            phone: true,
+            phoneNumber: true,
             status: true,
             createdAt: true,
           },
