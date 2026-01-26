@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get("search") || "";
 
   const where: Record<string, unknown> = {
-    role: "agent",
+    role: { not: "admin" },
   };
 
   // Filter by subscription status
