@@ -116,7 +116,7 @@ export default function LandingPage() {
     },
     {
       question: "What if a recruit doesn't respond?",
-      answer: "All recruits have opted in within the last 24 hours and are expecting contact. However, all sales are final once delivered. We recommend reaching out across all platforms (call, text, email, Instagram) for best results."
+      answer: "All recruits have opted in within the last 24 hours and are expecting contact. If the contact info is invalid or you can't reach out for any reason, we'll provide a replacement, no questions asked."
     },
     {
       question: "How often does inventory refresh?",
