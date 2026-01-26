@@ -3,24 +3,17 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import LogoSlider from "@/components/landing/LogoSlider";
+import { trackInitiateCheckout } from "@/components/MetaPixel";
 
 const rotatingWords = ["Overrides", "Downline", "Business"];
 
-export default function LandingPage() {
+export default function LandingPageVariantA() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
-  const [isSignupLoading, setIsSignupLoading] = useState(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [visibleMessages, setVisibleMessages] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-
-  // Signup form state
-  const [signupEmail, setSignupEmail] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
-  const [signupFirstName, setSignupFirstName] = useState("");
-  const [signupLastName, setSignupLastName] = useState("");
-  const [signupError, setSignupError] = useState("");
-  const [signupSuccess, setSignupSuccess] = useState(false);
 
   // Calculator state
   const [recruitsPerMonth, setRecruitsPerMonth] = useState(10);
@@ -59,35 +52,25 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [visibleMessages]);
 
-  // VARIANT C: Free signup - no payment required
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSignupLoading(true);
-    setSignupError("");
-
+  const handleGetStarted = async () => {
+    setIsCheckoutLoading(true);
+    trackInitiateCheckout(99);
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: signupEmail,
-          password: signupPassword,
-          firstName: signupFirstName,
-          lastName: signupLastName,
-        }),
+        body: JSON.stringify({}),
       });
       const data = await res.json();
-
-      if (res.ok) {
-        setSignupSuccess(true);
+      if (data.url) {
+        window.location.href = data.url;
       } else {
-        setSignupError(data.error || "Something went wrong. Please try again.");
+        console.error("No checkout URL returned");
+        setIsCheckoutLoading(false);
       }
     } catch (error) {
-      console.error("Signup error:", error);
-      setSignupError("Something went wrong. Please try again.");
-    } finally {
-      setIsSignupLoading(false);
+      console.error("Checkout error:", error);
+      setIsCheckoutLoading(false);
     }
   };
 
@@ -120,10 +103,6 @@ export default function LandingPage() {
 
   const faqs = [
     {
-      question: "Is it really free to sign up?",
-      answer: "Yes! Creating an account is completely free with no credit card required. You only pay when you decide to purchase recruits - $35 for unlicensed and $50 for licensed. No subscriptions, no hidden fees."
-    },
-    {
       question: "What's the difference between licensed and unlicensed recruits?",
       answer: "Unlicensed recruits (ages 18-25) are ready to get licensed and start fresh with your training. Licensed recruits (ages 18-30) already have their license and can begin producing immediately."
     },
@@ -147,6 +126,10 @@ export default function LandingPage() {
       question: "Can we target specific states or counties?",
       answer: "Yes! Create a custom request in your dashboard and we'll source recruits from your specific geographic areas."
     },
+    {
+      question: "How does the free first recruit work?",
+      answer: "When you sign up, your first recruit is completely free. No strings attached. It's our way of letting you experience the quality of our recruits before you invest."
+    },
   ];
 
   return (
@@ -159,12 +142,13 @@ export default function LandingPage() {
             <p className="text-[10px] font-medium tracking-[0.2em] text-slate-400 uppercase">Recruiting Solutions</p>
           </div>
           {hasScrolled ? (
-            <a
-              href="#signup"
-              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all transform animate-slideIn"
+            <button
+              onClick={handleGetStarted}
+              disabled={isCheckoutLoading}
+              className="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all transform animate-slideIn disabled:opacity-50 disabled:cursor-wait"
             >
-              Create Free Account →
-            </a>
+              {isCheckoutLoading ? "Loading..." : "Try Free →"}
+            </button>
           ) : (
             <Link
               href="/login"
@@ -199,9 +183,17 @@ export default function LandingPage() {
             <span className="block">Grow Your <span key={wordIndex} className="text-sky-400 inline-block animate-fadeInWord">{rotatingWords[wordIndex]}</span><br className="lg:hidden" /> in Minutes.</span>
           </h1>
 
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-6 leading-relaxed">
             We find people who want to sell insurance both licensed and unlicensed. Create your account, pick how many you need, get their info in your CRM within minutes, then use our proven script to onboard them to your team fast.
           </p>
+
+          {/* First Recruit Free Badge */}
+          <div className="flex justify-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
+              <span className="text-lg">🎁</span>
+              <span className="text-sm font-semibold text-emerald-400">First Recruit FREE for New Users</span>
+            </div>
+          </div>
 
           {/* Feature Pills */}
           <div className="flex flex-col items-center gap-2 sm:gap-3 mb-12">
@@ -282,156 +274,105 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Purchase Card Section - VARIANT C: Free Signup */}
-      <section id="signup" className="pb-20 scroll-mt-20">
+      {/* Purchase Card Section */}
+      <section className="pb-20">
         <div className="max-w-lg mx-auto px-6">
           <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-2xl p-8 relative overflow-hidden">
             {/* Decorative gradient */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-sky-500/10 to-cyan-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
             <div className="relative">
-              {/* Free Badge */}
-              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-6 text-center">
-                <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">Free Account</div>
+              {/* Free Trial Badge */}
+              <div className="bg-sky-500/10 border border-sky-500/30 rounded-xl p-4 mb-6 text-center">
+                <div className="text-xs font-semibold text-sky-400 uppercase tracking-wider mb-1">Start Free</div>
                 <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-4xl font-bold text-white">$0</span>
-                  <span className="text-slate-400">to sign up</span>
+                  <span className="text-3xl font-bold text-white">7-Day Free Trial</span>
                 </div>
-                <p className="text-slate-400 text-sm mt-1">Only pay when you purchase recruits</p>
+                <p className="text-slate-400 text-sm mt-1">No charge during trial</p>
               </div>
 
-              {signupSuccess ? (
-                <div className="text-center py-6">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-emerald-500/20 rounded-full flex items-center justify-center">
-                    <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Check Your Email!</h3>
-                  <p className="text-slate-400 mb-4">
-                    We&apos;ve sent a verification link to <span className="text-white">{signupEmail}</span>
-                  </p>
-                  <p className="text-sm text-slate-500">
-                    Click the link in your email to activate your account and start browsing recruits.
-                  </p>
+              {/* First Recruit Free Badge */}
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <span className="text-2xl">🎁</span>
+                  <span className="text-2xl font-bold text-emerald-400">First Recruit FREE</span>
                 </div>
-              ) : (
-                <>
-                  {/* Signup Form */}
-                  <form onSubmit={handleSignup} className="space-y-4 mb-6">
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        placeholder="First name"
-                        value={signupFirstName}
-                        onChange={(e) => setSignupFirstName(e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 transition-colors"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Last name"
-                        value={signupLastName}
-                        onChange={(e) => setSignupLastName(e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 transition-colors"
-                      />
-                    </div>
-                    <input
-                      type="email"
-                      placeholder="Email address"
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                      required
-                      className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 transition-colors"
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password (6+ characters)"
-                      value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
-                      required
-                      minLength={6}
-                      className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 transition-colors"
-                    />
+                <p className="text-slate-400 text-sm">Your first recruit is on us when you sign up</p>
+              </div>
 
-                    {signupError && (
-                      <p className="text-red-400 text-sm text-center">{signupError}</p>
-                    )}
+              {/* Trust Badges */}
+              <div className="grid grid-cols-4 gap-2 py-4 mb-6 border-y border-slate-700">
+                <div className="text-center">
+                  <svg className="w-6 h-6 mx-auto text-sky-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 11 14 15 10"/>
+                  </svg>
+                  <p className="text-[10px] font-semibold text-slate-300 uppercase">SSL</p>
+                  <p className="text-[9px] text-slate-500">Encrypted</p>
+                </div>
+                <div className="text-center">
+                  <svg className="w-6 h-6 mx-auto text-sky-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                    <line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                  <p className="text-[10px] font-semibold text-slate-300 uppercase">Secure</p>
+                  <p className="text-[9px] text-slate-500">Checkout</p>
+                </div>
+                <div className="text-center">
+                  <svg className="w-6 h-6 mx-auto text-sky-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  <p className="text-[10px] font-semibold text-slate-300 uppercase">Instant</p>
+                  <p className="text-[9px] text-slate-500">Delivery</p>
+                </div>
+                <div className="text-center">
+                  <svg className="w-6 h-6 mx-auto text-sky-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  <p className="text-[10px] font-semibold text-slate-300 uppercase">Verified</p>
+                  <p className="text-[9px] text-slate-500">Contacts</p>
+                </div>
+              </div>
 
-                    <button
-                      type="submit"
-                      disabled={isSignupLoading}
-                      className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all disabled:opacity-50 disabled:cursor-wait"
-                    >
-                      {isSignupLoading ? "Creating Account..." : "Create Free Account →"}
-                    </button>
-                  </form>
-
-                  {/* Trust Badges */}
-                  <div className="grid grid-cols-4 gap-2 py-4 mb-6 border-y border-slate-700">
-                    <div className="text-center">
-                      <svg className="w-6 h-6 mx-auto text-sky-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        <polyline points="9 12 11 14 15 10"/>
-                      </svg>
-                      <p className="text-[10px] font-semibold text-slate-300 uppercase">SSL</p>
-                      <p className="text-[9px] text-slate-500">Encrypted</p>
-                    </div>
-                    <div className="text-center">
-                      <svg className="w-6 h-6 mx-auto text-sky-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                        <polyline points="22 4 12 14.01 9 11.01"/>
-                      </svg>
-                      <p className="text-[10px] font-semibold text-slate-300 uppercase">No</p>
-                      <p className="text-[9px] text-slate-500">Credit Card</p>
-                    </div>
-                    <div className="text-center">
-                      <svg className="w-6 h-6 mx-auto text-sky-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                      </svg>
-                      <p className="text-[10px] font-semibold text-slate-300 uppercase">Instant</p>
-                      <p className="text-[9px] text-slate-500">Access</p>
-                    </div>
-                    <div className="text-center">
-                      <svg className="w-6 h-6 mx-auto text-sky-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                        <polyline points="22 4 12 14.01 9 11.01"/>
-                      </svg>
-                      <p className="text-[10px] font-semibold text-slate-300 uppercase">Verified</p>
-                      <p className="text-[9px] text-slate-500">Contacts</p>
-                    </div>
+              {/* Pricing Pills */}
+              <div className="flex justify-center gap-3 mb-6">
+                <div className="flex flex-col items-center px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-2xl">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-300">Unlicensed</span>
+                    <span className="text-sm font-bold text-emerald-400">$35</span>
                   </div>
-
-                  {/* Pricing Pills */}
-                  <div className="flex justify-center gap-3 mb-4">
-                    <div className="flex flex-col items-center px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-2xl">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-slate-300">Unlicensed</span>
-                        <span className="text-sm font-bold text-emerald-400">$35</span>
-                      </div>
-                      <span className="text-xs text-slate-500">Ages 18-25</span>
-                    </div>
-                    <div className="flex flex-col items-center px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-2xl">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-slate-300">Licensed</span>
-                        <span className="text-sm font-bold text-emerald-400">$50</span>
-                      </div>
-                      <span className="text-xs text-slate-500">Ages 18-30</span>
-                    </div>
+                  <span className="text-xs text-slate-500">Ages 18-25</span>
+                </div>
+                <div className="flex flex-col items-center px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-2xl">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-300">Licensed</span>
+                    <span className="text-sm font-bold text-emerald-400">$50</span>
                   </div>
+                  <span className="text-xs text-slate-500">Ages 18-30</span>
+                </div>
+              </div>
 
-                  <p className="text-center text-xs text-slate-500">
-                    No subscription required • Pay only for recruits you purchase
-                  </p>
+              {/* CTA Button */}
+              <button
+                onClick={handleGetStarted}
+                disabled={isCheckoutLoading}
+                className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-white font-semibold text-lg shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all disabled:opacity-50 disabled:cursor-wait"
+              >
+                {isCheckoutLoading ? "Loading..." : "Try AgentSurge for Free →"}
+              </button>
 
-                  <p className="text-center text-sm text-slate-400 mt-6">
-                    Already have an account?{" "}
-                    <Link href="/login" className="text-sky-400 hover:text-sky-300 font-medium">
-                      Sign in
-                    </Link>
-                  </p>
-                </>
-              )}
+              <p className="text-center text-xs text-slate-500 mt-4">
+                No charge during trial • First recruit free • Cancel anytime
+              </p>
+
+              <p className="text-center text-sm text-slate-400 mt-6">
+                Already have an account?{" "}
+                <Link href="/login" className="text-sky-400 hover:text-sky-300 font-medium">
+                  Sign in
+                </Link>
+              </p>
             </div>
           </div>
         </div>
@@ -627,7 +568,7 @@ export default function LandingPage() {
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 flex gap-4">
               <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center text-xl flex-shrink-0">👤</div>
               <div>
-                <h4 className="font-semibold text-white mb-1">Your Account is Ready</h4>
+                <h4 className="font-semibold text-white mb-1">Your Free Account is Ready</h4>
                 <p className="text-sm text-slate-400">Your account is set up in seconds. Your login gives you 24/7 access to all your recruits.</p>
               </div>
             </div>
@@ -994,21 +935,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Final CTA - VARIANT C: Free Signup */}
-      <section className="py-20 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border-t border-slate-800">
+      {/* Final CTA */}
+      <section className="py-20 bg-gradient-to-r from-sky-500/10 to-cyan-500/10 border-t border-slate-800">
         <div className="max-w-3xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full mb-6">
+            <span className="text-lg">🎁</span>
+            <span className="text-sm font-semibold text-emerald-400">First Recruit FREE for New Users</span>
+          </div>
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Grow Your Team?
           </h2>
           <p className="text-slate-400 mb-8">
-            Create your free account today. No subscription required - only pay for the recruits you purchase.
+            Get started today with full access to our exclusive recruit database. Your first recruit is on us.
           </p>
-          <a
-            href="#signup"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all"
+          <button
+            onClick={handleGetStarted}
+            disabled={isCheckoutLoading}
+            className="px-8 py-4 bg-gradient-to-r from-sky-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all disabled:opacity-50 disabled:cursor-wait"
           >
-            Create Free Account →
-          </a>
+            {isCheckoutLoading ? "Loading..." : "Try AgentSurge for Free →"}
+          </button>
           <p className="text-sm text-slate-400 mt-6">
             Already have an account?{" "}
             <Link href="/login" className="text-sky-400 hover:text-sky-300 font-medium">
