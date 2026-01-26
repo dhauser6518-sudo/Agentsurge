@@ -182,6 +182,15 @@ export default function LandingPage() {
             <span className="block">Click. Buy. Recruit.</span>
             <span className="block">Grow Your <span key={wordIndex} className="text-sky-400 inline-block animate-fadeInWord">{rotatingWords[wordIndex]}</span><br className="lg:hidden" /> in Minutes.</span>
           </h1>
+
+          {/* First Recruit Free Badge */}
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
+              <span className="text-lg">🎁</span>
+              <span className="text-sm font-medium text-emerald-400">1st Recruit Free</span>
+            </div>
+          </div>
+
           <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
             We find people who want to sell insurance both licensed and unlicensed. Create your account, pick how many you need, get their info in your CRM within minutes, then use our proven script to onboard them to your team fast.
           </p>
@@ -205,19 +214,13 @@ export default function LandingPage() {
                 <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">24hr Fresh Leads</span>
               </div>
             </div>
-            {/* Second row - two pills */}
-            <div className="flex justify-center gap-2 sm:gap-3">
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M22 4 12 14.01 9 11.01"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M22 12a10 10 0 1 1-5.93-9.14"/>
-                </svg>
-                <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">Exclusive Access</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
-                <span className="text-sm">🎁</span>
-                <span className="text-xs sm:text-sm font-medium text-emerald-400 whitespace-nowrap">1st Recruit Free</span>
-              </div>
+            {/* Second row - single pill centered */}
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M22 4 12 14.01 9 11.01"/>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M22 12a10 10 0 1 1-5.93-9.14"/>
+              </svg>
+              <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">Exclusive Access</span>
             </div>
           </div>
 
