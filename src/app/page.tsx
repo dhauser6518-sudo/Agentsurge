@@ -122,6 +122,14 @@ export default function LandingPage() {
       question: "How often does inventory refresh?",
       answer: "Inventory updates in real time as new recruits opt in through our advertising campaigns. Availability varies throughout the day based on ad performance."
     },
+    {
+      question: "Can we target specific states or counties?",
+      answer: "Yes! Create a custom request in your dashboard and we'll source recruits from your specific geographic areas."
+    },
+    {
+      question: "How does the free first recruit work?",
+      answer: "When you sign up, your first recruit is completely free. No strings attached. It's our way of letting you experience the quality of our recruits before you invest."
+    },
   ];
 
   return (
@@ -197,13 +205,19 @@ export default function LandingPage() {
                 <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">24hr Fresh Leads</span>
               </div>
             </div>
-            {/* Second row - single pill centered */}
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M22 4 12 14.01 9 11.01"/>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M22 12a10 10 0 1 1-5.93-9.14"/>
-              </svg>
-              <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">Exclusive Access</span>
+            {/* Second row - two pills */}
+            <div className="flex justify-center gap-2 sm:gap-3">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M22 4 12 14.01 9 11.01"/>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M22 12a10 10 0 1 1-5.93-9.14"/>
+                </svg>
+                <span className="text-xs sm:text-sm font-medium text-slate-300 whitespace-nowrap">Exclusive Access</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
+                <span className="text-sm">🎁</span>
+                <span className="text-xs sm:text-sm font-medium text-emerald-400 whitespace-nowrap">1st Recruit Free</span>
+              </div>
             </div>
           </div>
 
@@ -274,6 +288,15 @@ export default function LandingPage() {
                 <p className="text-slate-400 text-sm mt-1">No charge during trial</p>
               </div>
 
+              {/* First Recruit Free Badge */}
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <span className="text-2xl">🎁</span>
+                  <span className="text-2xl font-bold text-emerald-400">First Recruit FREE</span>
+                </div>
+                <p className="text-slate-400 text-sm">Your first recruit is on us when you sign up</p>
+              </div>
+
               {/* Trust Badges */}
               <div className="grid grid-cols-4 gap-2 py-4 mb-6 border-y border-slate-700">
                 <div className="text-center">
@@ -338,7 +361,7 @@ export default function LandingPage() {
               </button>
 
               <p className="text-center text-xs text-slate-500 mt-4">
-                No charge during trial • Cancel anytime
+                No charge during trial • First recruit free • Cancel anytime
               </p>
 
               <p className="text-center text-sm text-slate-400 mt-6">
@@ -912,11 +935,15 @@ export default function LandingPage() {
       {/* Final CTA */}
       <section className="py-20 bg-gradient-to-r from-sky-500/10 to-cyan-500/10 border-t border-slate-800">
         <div className="max-w-3xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full mb-6">
+            <span className="text-lg">🎁</span>
+            <span className="text-sm font-semibold text-emerald-400">First Recruit FREE for New Users</span>
+          </div>
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Grow Your Team?
           </h2>
           <p className="text-slate-400 mb-8">
-            Get started today with full access to our exclusive recruit database.
+            Get started today with full access to our exclusive recruit database. Your first recruit is on us.
           </p>
           <button
             onClick={handleGetStarted}

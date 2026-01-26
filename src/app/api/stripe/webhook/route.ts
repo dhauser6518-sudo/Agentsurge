@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 import crypto from "crypto";
+import { getAvailableRecruits } from "@/lib/google-sheets";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -145,6 +146,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const magicLinkToken = crypto.randomBytes(32).toString("hex");
   const magicLinkExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
+  let isNewUser = false;
+
   if (user) {
     // Update existing user
     user = await prisma.user.update({
@@ -161,6 +164,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
   } else {
     // Create new user
+    isNewUser = true;
     user = await prisma.user.create({
       data: {
         email,
@@ -173,6 +177,50 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         magicLinkExpires,
       },
     });
+  }
+
+  // Give new users their first recruit for FREE
+  if (isNewUser) {
+    try {
+      // Get 1 available unlicensed recruit from Google Sheets
+      const availableRecruits = await getAvailableRecruits(false, 1);
+
+      if (availableRecruits.length > 0) {
+        const sheetRecruit = availableRecruits[0];
+
+        // Create a free purchase record
+        const purchase = await prisma.recruitPurchase.create({
+          data: {
+            userId: user.id,
+            type: "free_first",
+            amountCents: 0,
+            status: "delivered",
+            deliveredAt: new Date(),
+          },
+        });
+
+        // Create the recruit for the user
+        await prisma.recruit.create({
+          data: {
+            agentId: user.id,
+            firstName: sheetRecruit.firstName,
+            lastName: sheetRecruit.lastName,
+            phoneNumber: sheetRecruit.phone,
+            email: sheetRecruit.email || null,
+            igHandle: sheetRecruit.igHandle || null,
+            isLicensed: false,
+            purchaseId: purchase.id,
+          },
+        });
+
+        console.log(`Assigned free first recruit to new user: ${email}`);
+      } else {
+        console.log(`No available recruits for free first recruit: ${email}`);
+      }
+    } catch (error) {
+      console.error("Failed to assign free first recruit:", error);
+      // Don't fail the whole webhook if free recruit fails
+    }
   }
 
   // Send welcome email with magic link
