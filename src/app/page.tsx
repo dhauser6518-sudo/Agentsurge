@@ -191,7 +191,7 @@ export default function LandingPage() {
           <div className="flex justify-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
               <span className="text-lg">🎁</span>
-              <span className="text-sm font-medium text-emerald-400">1st Recruit Free</span>
+              <span className="text-sm font-semibold text-emerald-400">First Recruit FREE for New Users</span>
             </div>
           </div>
 
