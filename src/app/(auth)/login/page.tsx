@@ -323,13 +323,12 @@ function LoginForm() {
           {/* Footer */}
           <p className="text-center text-sm text-slate-500 mt-6">
             Don&apos;t have an account?{" "}
-            <button
-              onClick={handleStartTrial}
-              disabled={isCheckoutLoading}
-              className="text-sky-600 hover:text-sky-700 font-medium disabled:opacity-50"
+            <Link
+              href="/"
+              className="text-sky-600 hover:text-sky-700 font-medium"
             >
-              {isCheckoutLoading ? "Loading..." : "Start free trial"}
-            </button>
+              Create free account
+            </Link>
           </p>
         </div>
       </div>
