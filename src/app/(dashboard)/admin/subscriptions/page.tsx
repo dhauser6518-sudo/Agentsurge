@@ -66,6 +66,11 @@ export default function AdminSubscriptionsPage() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [totalCustomers, setTotalCustomers] = useState(0);
 
+  // Create account state
+  const [createEmail, setCreateEmail] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [createResult, setCreateResult] = useState<{ success?: boolean; message?: string; error?: string } | null>(null);
+
   const fetchCustomers = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -96,6 +101,35 @@ export default function AdminSubscriptionsPage() {
     return () => clearTimeout(debounce);
   }, [fetchCustomers]);
 
+  const handleCreateAccount = async () => {
+    if (!createEmail.trim()) return;
+
+    setIsCreating(true);
+    setCreateResult(null);
+
+    try {
+      const response = await fetch("/api/admin/create-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: createEmail.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setCreateResult({ error: data.error });
+      } else {
+        setCreateResult({ success: true, message: data.message });
+        setCreateEmail("");
+        fetchCustomers(); // Refresh the list
+      }
+    } catch {
+      setCreateResult({ error: "Failed to create account" });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-md">
@@ -111,6 +145,35 @@ export default function AdminSubscriptionsPage() {
         <p className="text-sm text-gray-600 mt-1">
           {totalCustomers} customer{totalCustomers !== 1 ? "s" : ""}
         </p>
+      </div>
+
+      {/* Create Account for Stripe Customer */}
+      <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 className="text-sm font-semibold text-blue-800 mb-2">
+          Create Account for Stripe Customer
+        </h3>
+        <p className="text-xs text-blue-600 mb-3">
+          Enter the email of a Stripe customer who needs a database account. They&apos;ll receive a welcome email to set up their password.
+        </p>
+        <div className="flex items-center gap-3">
+          <Input
+            placeholder="customer@email.com"
+            value={createEmail}
+            onChange={(e) => setCreateEmail(e.target.value)}
+            className="max-w-sm"
+          />
+          <Button
+            onClick={handleCreateAccount}
+            disabled={isCreating || !createEmail.trim()}
+          >
+            {isCreating ? "Creating..." : "Create & Send Email"}
+          </Button>
+        </div>
+        {createResult && (
+          <div className={`mt-3 text-sm ${createResult.success ? "text-green-600" : "text-red-600"}`}>
+            {createResult.success ? createResult.message : createResult.error}
+          </div>
+        )}
       </div>
 
       <div className="mb-4 flex items-center gap-4">
