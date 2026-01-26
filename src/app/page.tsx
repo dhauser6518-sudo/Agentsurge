@@ -937,9 +937,20 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-800 py-8">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-sm text-slate-500">
-            © {new Date().getFullYear()} AgentSurge Recruiting Solutions. All rights reserved.
-          </p>
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-sm text-slate-400">
+              Contact us:{" "}
+              <a
+                href="mailto:agentsurge.contact@gmail.com"
+                className="text-sky-400 hover:text-sky-300 transition-colors"
+              >
+                agentsurge.contact@gmail.com
+              </a>
+            </p>
+            <p className="text-sm text-slate-500">
+              © {new Date().getFullYear()} AgentSurge Recruiting Solutions. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
 
