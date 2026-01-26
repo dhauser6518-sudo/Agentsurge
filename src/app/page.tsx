@@ -183,17 +183,17 @@ export default function LandingPage() {
             <span className="block">Grow Your <span key={wordIndex} className="text-sky-400 inline-block animate-fadeInWord">{rotatingWords[wordIndex]}</span><br className="lg:hidden" /> in Minutes.</span>
           </h1>
 
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-6 leading-relaxed">
+            We find people who want to sell insurance both licensed and unlicensed. Create your account, pick how many you need, get their info in your CRM within minutes, then use our proven script to onboard them to your team fast.
+          </p>
+
           {/* First Recruit Free Badge */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
               <span className="text-lg">🎁</span>
               <span className="text-sm font-medium text-emerald-400">1st Recruit Free</span>
             </div>
           </div>
-
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            We find people who want to sell insurance both licensed and unlicensed. Create your account, pick how many you need, get their info in your CRM within minutes, then use our proven script to onboard them to your team fast.
-          </p>
 
           {/* Feature Pills */}
           <div className="flex flex-col items-center gap-2 sm:gap-3 mb-12">
