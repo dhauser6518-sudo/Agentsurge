@@ -20,12 +20,13 @@ export async function GET(request: NextRequest) {
   };
 
   // Filter by subscription status
-  if (status) {
+  if (status && status !== "all") {
     where.subscriptionStatus = status;
-  } else {
+  } else if (!status) {
     // By default, show all non-inactive subscriptions
     where.subscriptionStatus = { in: ["active", "trialing", "past_due"] };
   }
+  // If status === "all", no filter is applied
 
   // Search by email or name
   if (search) {

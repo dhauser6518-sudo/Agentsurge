@@ -34,6 +34,7 @@ interface CustomerWithCounts {
 
 const statusFilterOptions = [
   { value: "", label: "Active & Trial" },
+  { value: "all", label: "All Users" },
   { value: "active", label: "Active" },
   { value: "trialing", label: "Trialing" },
   { value: "past_due", label: "Past Due" },
