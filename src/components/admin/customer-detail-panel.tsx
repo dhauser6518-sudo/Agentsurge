@@ -155,7 +155,7 @@ export function CustomerDetailPanel({
           <div className="flex items-center gap-3">
             <Badge
               color={STATUS_COLORS[customer.subscriptionStatus] || "gray"}
-              size="lg"
+              size="md"
             >
               {STATUS_LABELS[customer.subscriptionStatus] || customer.subscriptionStatus}
             </Badge>
