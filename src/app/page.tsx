@@ -161,9 +161,9 @@ export default function LandingPage() {
           {hasScrolled ? (
             <a
               href="#signup"
-              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all transform animate-slideIn"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all transform animate-slideIn whitespace-nowrap"
             >
-              Create Free Account →
+              Try Free →
             </a>
           ) : (
             <Link
