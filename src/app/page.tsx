@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import LogoSlider from "@/components/landing/LogoSlider";
+import { trackLead } from "@/components/MetaPixel";
 
 const rotatingWords = ["Overrides", "Downline", "Business"];
 
@@ -80,6 +81,7 @@ export default function LandingPage() {
 
       if (res.ok) {
         setSignupSuccess(true);
+        trackLead(); // Fire Meta Lead event on successful signup
       } else {
         setSignupError(data.error || "Something went wrong. Please try again.");
       }

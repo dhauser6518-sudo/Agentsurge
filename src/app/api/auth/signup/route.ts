@@ -4,6 +4,48 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/resend";
 
+// Meta Conversions API helper for Lead event
+async function sendMetaLeadEvent(email: string) {
+  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const accessToken = process.env.META_CONVERSIONS_API_TOKEN;
+
+  if (!pixelId || !accessToken) {
+    console.log("Meta Conversions API not configured, skipping Lead event");
+    return;
+  }
+
+  // Hash email with SHA256 (required by Meta)
+  const hashedEmail = crypto.createHash("sha256").update(email.toLowerCase().trim()).digest("hex");
+
+  try {
+    const response = await fetch(
+      `https://graph.facebook.com/v18.0/${pixelId}/events`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data: [
+            {
+              event_name: "Lead",
+              event_time: Math.floor(Date.now() / 1000),
+              action_source: "website",
+              user_data: {
+                em: [hashedEmail],
+              },
+            },
+          ],
+          access_token: accessToken,
+        }),
+      }
+    );
+
+    const result = await response.json();
+    console.log("Meta Lead event sent:", result);
+  } catch (error) {
+    console.error("Failed to send Meta Lead event:", error);
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -116,6 +158,9 @@ export async function POST(request: NextRequest) {
         lastName: true,
       },
     });
+
+    // Send Meta Lead event via Conversions API
+    sendMetaLeadEvent(user.email);
 
     // Send verification email
     try {
