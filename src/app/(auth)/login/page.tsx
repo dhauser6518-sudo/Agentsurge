@@ -54,17 +54,7 @@ function LoginForm() {
   // Only redirect after a successful login (not on initial page load)
   useEffect(() => {
     if (justLoggedIn && status === "authenticated" && session?.user) {
-      const user = session.user as {
-        subscriptionStatus?: string;
-      };
-
-      const subStatus = user.subscriptionStatus;
-      if (!subStatus || subStatus === "inactive") {
-        // No subscription - they need to subscribe
-        router.push("/");
-        return;
-      }
-
+      // Pay-per-recruit model - no subscription required
       router.push("/dashboard");
     }
   }, [session, status, router, justLoggedIn]);
