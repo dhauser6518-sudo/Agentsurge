@@ -157,6 +157,15 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-slate-900">
+      {/* Promo Banner */}
+      <div className="bg-[#0b93f6] py-2.5 px-4 text-center">
+        <p className="text-white text-sm font-medium">
+          <span className="inline-block animate-pulse mr-2">*</span>
+          Get your first recruit free - limited time only
+          <span className="inline-block animate-pulse ml-2">*</span>
+        </p>
+      </div>
+
       {/* Header */}
       <header className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-800 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -167,9 +176,9 @@ export default function LandingPage() {
           {hasScrolled ? (
             <a
               href="#signup"
-              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all transform animate-slideIn whitespace-nowrap"
+              className="px-4 py-2 bg-[#0b93f6] hover:bg-[#0a84dd] text-white text-sm font-semibold rounded-lg shadow-lg shadow-[#0b93f6]/25 hover:shadow-[#0b93f6]/40 transition-all transform animate-slideIn whitespace-nowrap"
             >
-              Get Free Recruit →
+              Create My Free Account
             </a>
           ) : (
             <Link
@@ -366,9 +375,9 @@ export default function LandingPage() {
                     <button
                       type="submit"
                       disabled={isSignupLoading}
-                      className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all disabled:opacity-50 disabled:cursor-wait"
+                      className="w-full py-4 px-6 rounded-xl bg-[#0b93f6] hover:bg-[#0a84dd] text-white font-semibold text-lg shadow-lg shadow-[#0b93f6]/25 hover:shadow-[#0b93f6]/40 transition-all disabled:opacity-50 disabled:cursor-wait"
                     >
-                      {isSignupLoading ? "Creating Account..." : "Get Your Free Recruit →"}
+                      {isSignupLoading ? "Creating Account..." : "Create My Free Account"}
                     </button>
                   </form>
 
@@ -1029,9 +1038,9 @@ export default function LandingPage() {
           </p>
           <a
             href="#signup"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all"
+            className="inline-block px-8 py-4 bg-[#0b93f6] hover:bg-[#0a84dd] text-white font-semibold rounded-xl shadow-lg shadow-[#0b93f6]/25 hover:shadow-[#0b93f6]/40 transition-all"
           >
-            Get Your Free Recruit →
+            Create My Free Account
           </a>
           <p className="text-sm text-slate-400 mt-6">
             Already have an account?{" "}
