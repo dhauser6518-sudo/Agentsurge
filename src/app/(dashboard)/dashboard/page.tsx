@@ -96,10 +96,45 @@ export default function BuyRecruitsPage() {
     setPurchaseModal({ isOpen: true, type, quantity });
   };
 
-  const handlePurchaseConfirm = () => {
+  const handlePurchaseConfirm = async () => {
     setIsPurchasing(true);
 
-    // Build Shopify checkout URL
+    const isFreeRecruitClaim = isEligibleForFree && purchaseModal.quantity === 1;
+
+    // If claiming free recruit, call API directly
+    if (isFreeRecruitClaim) {
+      try {
+        const response = await fetch("/api/purchases", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: purchaseModal.type,
+            quantity: 1,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Refresh data and close modal
+          await fetchInventory();
+          await fetchUserStatus();
+          setPurchaseModal({ ...purchaseModal, isOpen: false });
+          // Redirect to recruits page to see the new recruit
+          window.location.href = purchaseModal.type === "licensed" ? "/dashboard/licensed" : "/dashboard/unlicensed";
+        } else {
+          alert(data.error || "Failed to claim free recruit");
+          setIsPurchasing(false);
+        }
+      } catch (error) {
+        console.error("Error claiming free recruit:", error);
+        alert("Something went wrong. Please try again.");
+        setIsPurchasing(false);
+      }
+      return;
+    }
+
+    // For paid purchases, redirect to Shopify checkout
     const variantId = SHOPIFY_VARIANTS[purchaseModal.type];
     const quantity = purchaseModal.quantity;
     const email = session?.user?.email || "";

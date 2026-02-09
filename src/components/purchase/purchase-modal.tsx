@@ -31,7 +31,7 @@ export function PurchaseModal({
   const isLicensed = type === "licensed";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Confirm Purchase">
+    <Modal isOpen={isOpen} onClose={onClose} title={total === 0 ? "Claim Your Free Recruit" : "Confirm Purchase"}>
       <div className="space-y-6">
         {/* Purchase Summary */}
         <div className="bg-slate-50 rounded-xl p-4 space-y-3">
@@ -121,9 +121,11 @@ export function PurchaseModal({
             disabled={isLoading}
             className={cn(
               "flex-1 py-3 px-4 rounded-xl bg-gradient-to-r text-white font-semibold shadow-lg transition-all disabled:opacity-50",
-              isLicensed
+              total === 0
                 ? "from-emerald-500 to-teal-500 shadow-emerald-500/25"
-                : "from-amber-500 to-orange-500 shadow-amber-500/25"
+                : isLicensed
+                  ? "from-emerald-500 to-teal-500 shadow-emerald-500/25"
+                  : "from-amber-500 to-orange-500 shadow-amber-500/25"
             )}
           >
             {isLoading ? (
@@ -132,8 +134,10 @@ export function PurchaseModal({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Redirecting...
+                {total === 0 ? "Claiming..." : "Redirecting..."}
               </span>
+            ) : total === 0 ? (
+              "Claim Free Recruit"
             ) : (
               "Proceed to Checkout"
             )}
