@@ -33,6 +33,10 @@ model User {
   subscriptionPeriodEnd DateTime? @map("subscription_period_end")
   trialEndsAt           DateTime? @map("trial_ends_at")
 
+  // Free first recruit tracking
+  freeRecruitClaimed    Boolean   @default(false) @map("free_recruit_claimed")
+  freeRecruitClaimedAt  DateTime? @map("free_recruit_claimed_at")
+
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -150,6 +154,17 @@ model RecruitPool {
   @@index([isLicensed, isAvailable])
   @@index([isAvailable])
   @@map("recruit_pool")
+}
+
+// Tracks claimed free recruit identifiers for anti-abuse
+model FreeRecruitClaim {
+  id            String   @id @default(uuid())
+  phoneHash     String   @unique @map("phone_hash")
+  userId        String   @map("user_id")
+  claimedAt     DateTime @default(now()) @map("claimed_at")
+
+  @@index([phoneHash])
+  @@map("free_recruit_claims")
 }
 
 // Tracks recruit purchases

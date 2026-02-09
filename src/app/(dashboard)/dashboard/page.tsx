@@ -17,12 +17,17 @@ const SHOPIFY_VARIANTS = {
   licensed: "42366682792007",
 };
 
+interface UserStatus {
+  freeRecruitClaimed: boolean;
+}
+
 export default function BuyRecruitsPage() {
   const { data: session } = useSession();
 
   // Inventory state
   const [inventory, setInventory] = useState({ unlicensed: 0, licensed: 0 });
   const [pendingCount, setPendingCount] = useState(0);
+  const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
 
   // Purchase modal state
   const [purchaseModal, setPurchaseModal] = useState<{
@@ -59,9 +64,22 @@ export default function BuyRecruitsPage() {
     }
   }, []);
 
+  const fetchUserStatus = useCallback(async () => {
+    try {
+      const response = await fetch("/api/user/status");
+      const data = await response.json();
+      if (response.ok) {
+        setUserStatus(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch user status:", err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchInventory();
     fetchPendingPurchases();
+    fetchUserStatus();
 
     // Poll for pending purchases
     const interval = setInterval(() => {
@@ -72,7 +90,7 @@ export default function BuyRecruitsPage() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [fetchInventory, fetchPendingPurchases, pendingCount]);
+  }, [fetchInventory, fetchPendingPurchases, fetchUserStatus, pendingCount]);
 
   const handlePurchaseClick = (type: "unlicensed" | "licensed", quantity: number) => {
     setPurchaseModal({ isOpen: true, type, quantity });
@@ -97,8 +115,29 @@ export default function BuyRecruitsPage() {
     window.location.href = checkoutUrl;
   };
 
+  const isEligibleForFree = userStatus && !userStatus.freeRecruitClaimed;
+
   return (
     <div className="animate-fadeIn">
+      {/* Free First Recruit Banner */}
+      {isEligibleForFree && (
+        <div className="mb-6 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl p-6 text-white shadow-lg shadow-emerald-500/25">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+              <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold">Your First Recruit is FREE!</h3>
+              <p className="text-white/90 mt-1">
+                Welcome to AgentSurge! Purchase any recruit below and your first one is on us.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pending Delivery Banner */}
       <PendingBanner pendingCount={pendingCount} />
 
@@ -125,6 +164,7 @@ export default function BuyRecruitsPage() {
           price={PRICES.unlicensed}
           onPurchase={(qty) => handlePurchaseClick("unlicensed", qty)}
           disabled={isPurchasing}
+          isEligibleForFree={isEligibleForFree || false}
         />
         <InventoryCard
           type="licensed"
@@ -132,6 +172,7 @@ export default function BuyRecruitsPage() {
           price={PRICES.licensed}
           onPurchase={(qty) => handlePurchaseClick("licensed", qty)}
           disabled={isPurchasing}
+          isEligibleForFree={isEligibleForFree || false}
         />
       </div>
 
@@ -167,6 +208,20 @@ export default function BuyRecruitsPage() {
             </div>
           </div>
         </div>
+
+        {/* Guarantee */}
+        <div className="mt-6 pt-6 border-t border-slate-200 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+            <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </div>
+          <div>
+            <h3 className="font-medium text-slate-900">If They Don&apos;t Onboard, You Don&apos;t Pay</h3>
+            <p className="text-sm text-slate-500 mt-0.5">Recruit didn&apos;t work out? We&apos;ll provide a replacement or refund, no questions asked.</p>
+          </div>
+        </div>
       </div>
 
       {/* Purchase Confirmation Modal */}
@@ -178,6 +233,7 @@ export default function BuyRecruitsPage() {
         quantity={purchaseModal.quantity}
         pricePerUnit={PRICES[purchaseModal.type]}
         isLoading={isPurchasing}
+        isEligibleForFree={isEligibleForFree || false}
       />
     </div>
   );

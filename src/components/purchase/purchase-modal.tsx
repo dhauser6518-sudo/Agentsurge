@@ -11,6 +11,7 @@ interface PurchaseModalProps {
   quantity: number;
   pricePerUnit: number;
   isLoading: boolean;
+  isEligibleForFree?: boolean;
 }
 
 export function PurchaseModal({
@@ -21,8 +22,12 @@ export function PurchaseModal({
   quantity,
   pricePerUnit,
   isLoading,
+  isEligibleForFree = false,
 }: PurchaseModalProps) {
-  const total = quantity * pricePerUnit;
+  const originalTotal = quantity * pricePerUnit;
+  const total = isEligibleForFree
+    ? Math.max(0, (quantity - 1) * pricePerUnit)
+    : originalTotal;
   const isLicensed = type === "licensed";
 
   return (
@@ -49,21 +54,55 @@ export function PurchaseModal({
             <span className="text-slate-600">Price per recruit</span>
             <span className="font-semibold text-slate-900">${pricePerUnit}</span>
           </div>
+          {isEligibleForFree && (
+            <div className="flex items-center justify-between text-emerald-600">
+              <span className="text-slate-600">Free recruit discount</span>
+              <span className="font-semibold">-${pricePerUnit}</span>
+            </div>
+          )}
           <div className="border-t pt-3 flex items-center justify-between">
             <span className="font-semibold text-slate-900">Total</span>
-            <span className="text-xl font-bold text-slate-900">${total}</span>
+            {isEligibleForFree && originalTotal !== total ? (
+              <span className="text-xl font-bold text-slate-900">
+                <span className="line-through text-slate-400 text-base mr-2">${originalTotal}</span>
+                {total === 0 ? <span className="text-emerald-600">FREE</span> : `$${total}`}
+              </span>
+            ) : (
+              <span className="text-xl font-bold text-slate-900">${total}</span>
+            )}
           </div>
         </div>
 
         {/* Payment Notice */}
-        <div className="flex items-start gap-3 p-4 bg-sky-50 rounded-xl">
-          <svg className="w-5 h-5 text-sky-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        <div className={cn(
+          "flex items-start gap-3 p-4 rounded-xl",
+          total === 0 ? "bg-emerald-50" : "bg-sky-50"
+        )}>
+          <svg className={cn(
+            "w-5 h-5 flex-shrink-0 mt-0.5",
+            total === 0 ? "text-emerald-500" : "text-sky-500"
+          )} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            {total === 0 ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            )}
           </svg>
           <div>
-            <p className="text-sm font-medium text-sky-900">Secure Checkout</p>
-            <p className="text-xs text-sky-700 mt-0.5">
-              You&apos;ll be redirected to complete your ${total} purchase
+            <p className={cn(
+              "text-sm font-medium",
+              total === 0 ? "text-emerald-900" : "text-sky-900"
+            )}>
+              {total === 0 ? "Free Recruit!" : "Secure Checkout"}
+            </p>
+            <p className={cn(
+              "text-xs mt-0.5",
+              total === 0 ? "text-emerald-700" : "text-sky-700"
+            )}>
+              {total === 0
+                ? "Your first recruit is on us - no payment required!"
+                : `You'll be redirected to complete your $${total} purchase`
+              }
             </p>
           </div>
         </div>

@@ -122,8 +122,12 @@ export default function LandingPage() {
 
   const faqs = [
     {
-      question: "Is it really free to sign up?",
-      answer: "Yes! Creating an account is completely free with no credit card required. You only pay when you decide to purchase recruits - $35 for unlicensed and $50 for licensed. No subscriptions, no hidden fees."
+      question: "Is the first recruit really free?",
+      answer: "Yes! Your first recruit is completely on us - no payment required. After that, recruits are $35 for unlicensed and $50 for licensed. No subscriptions, no hidden fees."
+    },
+    {
+      question: "What does 'if they don't onboard, you don't pay' mean?",
+      answer: "It's our risk-free guarantee. If a recruit doesn't end up joining your team (bad contact info, not interested, or any other reason), just let us know and we'll provide a replacement or refund. You only pay for results."
     },
     {
       question: "What's the difference between licensed and unlicensed recruits?",
@@ -165,7 +169,7 @@ export default function LandingPage() {
               href="#signup"
               className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-sm font-semibold rounded-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all transform animate-slideIn whitespace-nowrap"
             >
-              Try Free →
+              Get Free Recruit →
             </a>
           ) : (
             <Link
@@ -294,12 +298,12 @@ export default function LandingPage() {
             <div className="relative">
               {/* Free Badge */}
               <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-6 text-center">
-                <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">Free Account</div>
+                <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">First Recruit FREE</div>
                 <div className="flex items-baseline justify-center gap-2">
                   <span className="text-4xl font-bold text-white">$0</span>
-                  <span className="text-slate-400">to sign up</span>
+                  <span className="text-slate-400">for your first recruit</span>
                 </div>
-                <p className="text-slate-400 text-sm mt-1">Only pay when you purchase recruits</p>
+                <p className="text-slate-400 text-sm mt-1">If they don&apos;t onboard, you don&apos;t pay</p>
               </div>
 
               {signupSuccess ? (
@@ -364,7 +368,7 @@ export default function LandingPage() {
                       disabled={isSignupLoading}
                       className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all disabled:opacity-50 disabled:cursor-wait"
                     >
-                      {isSignupLoading ? "Creating Account..." : "Create Free Account →"}
+                      {isSignupLoading ? "Creating Account..." : "Get Your Free Recruit →"}
                     </button>
                   </form>
 
@@ -423,7 +427,7 @@ export default function LandingPage() {
                   </div>
 
                   <p className="text-center text-xs text-slate-500">
-                    No subscription required • Pay only for recruits you purchase
+                    First recruit FREE • No onboard, no pay guarantee
                   </p>
 
                   <p className="text-center text-sm text-slate-400 mt-6">
@@ -942,7 +946,8 @@ export default function LandingPage() {
 
       {/* Guarantee Section */}
       <section className="py-16 border-t border-slate-800">
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-3xl mx-auto px-6 space-y-4">
+          {/* No Onboard No Pay Guarantee */}
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-6">
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
               <svg className="w-8 h-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -951,9 +956,26 @@ export default function LandingPage() {
               </svg>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white mb-2">100% Contact Rate Guarantee</h3>
+              <h3 className="text-xl font-bold text-white mb-2">If They Don&apos;t Onboard, You Don&apos;t Pay</h3>
               <p className="text-slate-400">
-                Every recruit in our database opted in less than 24 hours ago. If the contact info is invalid or you can&apos;t reach out for any reason whatsoever, you&apos;ll be provided a replacement, no questions asked.
+                We stand behind our recruits. If someone doesn&apos;t end up joining your team for any reason - bad contact info, changed their mind, or just didn&apos;t work out - we&apos;ll provide a replacement or refund. Zero risk.
+              </p>
+            </div>
+          </div>
+
+          {/* First Recruit Free */}
+          <div className="bg-sky-500/10 border border-sky-500/30 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-6">
+            <div className="w-16 h-16 rounded-full bg-sky-500/20 flex items-center justify-center flex-shrink-0">
+              <svg className="w-8 h-8 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">First Recruit Is On Us</h3>
+              <p className="text-slate-400">
+                Try before you buy. Your very first recruit is completely free - no strings attached. Experience the quality of our leads firsthand, then decide if you want more.
               </p>
             </div>
           </div>
@@ -1003,13 +1025,13 @@ export default function LandingPage() {
             Ready to Grow Your Team?
           </h2>
           <p className="text-slate-400 mb-8">
-            Create your free account today. No subscription required - only pay for the recruits you purchase.
+            Get your first recruit completely free. If they don&apos;t onboard, you don&apos;t pay - guaranteed.
           </p>
           <a
             href="#signup"
             className="inline-block px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all"
           >
-            Create Free Account →
+            Get Your Free Recruit →
           </a>
           <p className="text-sm text-slate-400 mt-6">
             Already have an account?{" "}

@@ -10,6 +10,7 @@ interface InventoryCardProps {
   onPurchase: (quantity: number) => void;
   isLoading?: boolean;
   disabled?: boolean;
+  isEligibleForFree?: boolean;
 }
 
 export function InventoryCard({
@@ -19,6 +20,7 @@ export function InventoryCard({
   onPurchase,
   isLoading = false,
   disabled = false,
+  isEligibleForFree = false,
 }: InventoryCardProps) {
   const [quantity, setQuantity] = useState(1);
 
@@ -42,7 +44,10 @@ export function InventoryCard({
       };
 
   const maxQty = Math.min(available, 10);
-  const total = quantity * price;
+  // If eligible for free, first one is $0
+  const total = isEligibleForFree
+    ? Math.max(0, (quantity - 1) * price)
+    : quantity * price;
 
   return (
     <div className={cn(
@@ -101,7 +106,17 @@ export function InventoryCard({
               </button>
             </div>
             <span className="text-sm text-slate-500 ml-auto">
-              Total: <span className="text-white font-semibold">${total}</span>
+              Total:{" "}
+              {isEligibleForFree && quantity === 1 ? (
+                <span className="text-emerald-400 font-semibold">FREE</span>
+              ) : isEligibleForFree ? (
+                <span className="text-white font-semibold">
+                  <span className="line-through text-slate-500 mr-1">${quantity * price}</span>
+                  ${total}
+                </span>
+              ) : (
+                <span className="text-white font-semibold">${total}</span>
+              )}
             </span>
           </div>
 
@@ -122,6 +137,8 @@ export function InventoryCard({
                 </svg>
                 Processing...
               </span>
+            ) : isEligibleForFree && quantity === 1 ? (
+              "Get Your Free Recruit"
             ) : (
               `Buy ${quantity} Recruit${quantity > 1 ? "s" : ""}`
             )}

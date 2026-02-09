@@ -2,11 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getAvailableRecruits } from "@/lib/google-sheets";
+import crypto from "crypto";
 
 const PRICES = {
   unlicensed: 3500, // $35
   licensed: 5000,   // $50
 };
+
+// Hash phone number for anti-abuse tracking
+function hashPhone(phone: string): string {
+  // Normalize phone: remove all non-digits
+  const normalized = phone.replace(/\D/g, "");
+  return crypto.createHash("sha256").update(normalized).digest("hex");
+}
 
 // GET /api/purchases - Get user's purchase history
 export async function GET() {
@@ -79,6 +87,9 @@ export async function POST(request: NextRequest) {
 
     const isLicensed = type === "licensed";
 
+    // Check if user is eligible for free first recruit
+    const isEligibleForFree = !user.freeRecruitClaimed;
+
     // Get available recruits from Google Sheets
     const availableRecruits = await getAvailableRecruits(isLicensed, qty);
 
@@ -90,15 +101,58 @@ export async function POST(request: NextRequest) {
     }
 
     const purchaseIds: string[] = [];
+    let freeRecruitGiven = false;
+    let totalAmount = 0;
 
     // Create recruits and purchase records
-    for (const sheetRecruit of availableRecruits) {
+    for (let i = 0; i < availableRecruits.length; i++) {
+      const sheetRecruit = availableRecruits[i];
+      const isFreeRecruit = isEligibleForFree && i === 0 && !freeRecruitGiven;
+
+      // For free recruit, check anti-abuse: has this phone been used before?
+      if (isFreeRecruit) {
+        const phoneHash = hashPhone(sheetRecruit.phone);
+        const existingClaim = await prisma.freeRecruitClaim.findUnique({
+          where: { phoneHash },
+        });
+
+        if (existingClaim) {
+          // This phone was already used for a free recruit - charge normally
+          console.log(`Anti-abuse: Phone hash ${phoneHash.slice(0, 8)}... already claimed free recruit`);
+        } else {
+          // Valid free recruit - record the claim
+          await prisma.freeRecruitClaim.create({
+            data: {
+              phoneHash,
+              userId: user.id,
+            },
+          });
+
+          // Mark user as having claimed their free recruit
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              freeRecruitClaimed: true,
+              freeRecruitClaimedAt: new Date(),
+            },
+          });
+
+          freeRecruitGiven = true;
+        }
+      }
+
+      const recruitPrice = (isFreeRecruit && freeRecruitGiven)
+        ? 0
+        : PRICES[type as keyof typeof PRICES];
+
+      totalAmount += recruitPrice;
+
       // Create purchase record
       const purchase = await prisma.recruitPurchase.create({
         data: {
           userId: user.id,
-          type,
-          amountCents: PRICES[type as keyof typeof PRICES],
+          type: (isFreeRecruit && freeRecruitGiven) ? "free_first" : type,
+          amountCents: recruitPrice,
           status: "delivered",
           deliveredAt: new Date(),
         },
@@ -122,13 +176,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const totalAmount = qty * PRICES[type as keyof typeof PRICES];
-
     return NextResponse.json({
       success: true,
       purchaseIds,
       status: "delivered",
       total: totalAmount / 100,
+      freeRecruitApplied: freeRecruitGiven,
     });
   } catch (error) {
     console.error("Error creating purchase:", error);
