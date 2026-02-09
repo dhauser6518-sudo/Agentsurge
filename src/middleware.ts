@@ -39,11 +39,8 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", nextUrl));
   }
 
-  // Require active subscription to access dashboard
-  if (isLoggedIn && !hasActiveSubscription && !isAdminRoute) {
-    // Redirect to home to sign up
-    return NextResponse.redirect(new URL("/", nextUrl));
-  }
+  // NOTE: Subscription check removed - now using pay-per-recruit model
+  // Users can access dashboard without subscription
 
   // Protect admin routes
   if (isAdminRoute && !isAdmin) {
