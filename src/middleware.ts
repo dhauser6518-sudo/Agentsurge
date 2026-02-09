@@ -11,7 +11,7 @@ export default auth((req) => {
   const isLoginPage = nextUrl.pathname === "/login";
   const isApiRoute = nextUrl.pathname.startsWith("/api");
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-  const isPublicRoute = nextUrl.pathname === "/" || nextUrl.pathname === "/welcome" || nextUrl.pathname === "/a" || nextUrl.pathname === "/b" || nextUrl.pathname === "/c";
+  const isPublicRoute = nextUrl.pathname === "/" || nextUrl.pathname === "/welcome" || nextUrl.pathname === "/a" || nextUrl.pathname === "/b" || nextUrl.pathname === "/c" || nextUrl.pathname === "/verify-email";
   const isAuthSetupRoute = nextUrl.pathname.startsWith("/auth/");
 
   // Allow API routes to handle their own auth
