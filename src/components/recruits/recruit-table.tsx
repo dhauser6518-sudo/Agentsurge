@@ -109,10 +109,10 @@ export function RecruitTable({
                     <span className="ml-2 text-xs text-yellow-600">(Disputed)</span>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-right">
                   <Dropdown
                     trigger={
-                      <button className="p-2 text-gray-400 hover:text-gray-600">
+                      <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                         </svg>
